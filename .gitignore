@@ -28,5 +28,5 @@ node_modules
 .lock-wscript
 
 #tex stuff
-.aux
-.toc
+*.aux
+*.toc
