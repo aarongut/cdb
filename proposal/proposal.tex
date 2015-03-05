@@ -73,13 +73,13 @@ we plan to use for our project.
 \item The Architecture of Open Source Applications (Volume 2): Processing.js\\
   http://www.aosabook.org/en/pjs.html
   \par
-  In Chapter 17 of Mike Kamermans' book The Architecture of Open
-  Source Applications, he discusses the design of
+  In Chapter 17 of Mike Kamermans' book {\it The Architecture of Open
+  Source Applications}, he discusses the design of
   Processing.js. Processing is a Java-based programming language
   designed to help teach computer programming in a visual
   context. Processing.js is a project designed to run Processing
   programs in the web browser using only JavaScript.  This was done by
-  writing a own Java-to-JavaScript compiler, and running the resulting
+  writing a Java-to-JavaScript compiler, and running the resulting
   code attached to a HTML canvas.  Along the way, the developers ran
   into several different challenges, mostly due to differences between
   the Java and JavaScript languages.  The largest difference between
@@ -105,7 +105,7 @@ we plan to use for our project.
 Our goal is to build a web application that can debug C0 code.
 The user will type in or upload C0 source files.
 Once this is done, these files will be transferred to our server,
-where the cc0 compiler will be used to
+where the existing cc0 compiler will be used to
 generate bytecode corresponding to the user's source code.
 This bytecode will be sent back to the user's web browser,
 where we will be running a C0 virtual machine.
@@ -131,7 +131,7 @@ underlying computation model works when evaluating their code.
 The C0 Debugger will also enable students to test simple programs with little
 setup, using only a web browser. They will no longer have to set up and become
 familiar with a Unix environment before they can program, making C0 accessible
-to more people.
+to more people, more quickly.
 
 \section{Approach}
 \par
@@ -143,9 +143,9 @@ have certain tasks completed.
 
 \subsection{Methodology}
 The C0 Debugger is designed for the CMU teaching language, C0.  It will be
-hosted on <BLANK> with the website itself designed in CSS and HTML, using
+hosted on heroku with the website itself designed in CSS and HTML, using
 Node.js to run most of the core functionality.  We will first deploy a blank
-template website after which half of the team wil work on parsing C0 bytecode
+template website after which half of the team will work on parsing C0 bytecode
 and the other half will work on creating a meaningful user experience.  Once
 both teams have made reasonable progress, they will combine the two units to
 complete the basic outline of the project.
