@@ -3,26 +3,22 @@
 \usepackage{setspace}
 \usepackage[margin=1in]{geometry}
 
+% Make table of contents look better
 \usepackage{tabularx}
-
 \usepackage{tocloft}
 \renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
 
+\usepackage{graphicx}
+\usepackage{pdfpages}
+
+% Times New Roman font
 \usepackage{txfonts}
 
-%% END PREAMBLE
 \begin{document}
 
-%\doublespacing
 \setlength{\parindent}{2em}
 
-\begin{titlepage}
-\clearpage
-\thispagestyle{empty}
-
-Letter of transmittal goes HEER
-
-\end{titlepage}
+\includepdf[pages={1}]{letter.pdf}
 
 \begin{titlepage}
 \clearpage
@@ -158,6 +154,12 @@ next two phases occurring simultaneously and composing the rest of the month's
 work.  User implementation and revisions will then hopefully take up the
 remainder of the alloted time, with extra time padded in case implementation or
 revisions are more extensive than we have predicted.
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\linewidth]{gantt.png}
+  \caption{Project Gantt chart}
+  \label{fig:gantt}
+\end{figure}
 
 \section{Evaluation Criteria}
 \par
