@@ -52,7 +52,7 @@ we plan to use for our project.
   \par
   In this blog post, Amjad Masad describes how he implemented
   debug.js, a JavaScript debugger running inside the web
-  browser. Since we wish to implement a c0 debugger running inside the
+  browser. Since we wish to implement a C0 debugger running inside the
   web browser, Masad's notes seem to be relevant.  Specifically, this
   post discusses the architecture of debug.js, as well as various
   challenges Masad faced in developing it.  Debug.js was designed in
@@ -67,7 +67,7 @@ we plan to use for our project.
   debug.js. These included being able to step line-by-line through a
   program, keeping track of a call stack, handling errors and
   exceptions, implementing native APIs, and dealing with events. While
-  many of the details will be different when working with c0, we must
+  many of the details will be different when working with C0, we must
   still consider all of these challenges in developing our project.
 
 \item The Architecture of Open Source Applications (Volume 2): Processing.js\\
@@ -95,47 +95,52 @@ we plan to use for our project.
   that node is a good fit for our project since we are writing
   JavaScript for the client side of our code, so this will let us work
   in the same language on the server and client side.  Also, we can
-  make use of the existing cc0 compiler to translate c0 source code to
+  make use of the existing cc0 compiler to translate C0 source code to
   the bytecode our virtual machine will run. This is the same compiler
   used in 15-122, and integrating it with our server will make it
-  feasible to run actual c0 source code.
+  feasible to run actual C0 source code.
 \end{itemize}
 \section{Plan}
 \par
-Our goal is to build a web application that can debug c0 code.
-The user will type in or upload c0 source files.
+Our goal is to build a web application that can debug C0 code.
+The user will type in or upload C0 source files.
 Once this is done, these files will be transferred to our server,
 where the cc0 compiler will be used to
 generate bytecode corresponding to the user's source code.
 This bytecode will be sent back to the user's web browser,
-where we will be running a c0 virtual machine.
+where we will be running a C0 virtual machine.
 The user will be able to control this virtual machine as it executes their code. 
 This will give the user the ability to run their code line-by-line,
 to set breakpoints, view stack traces, and see the values of variables.
 By providing access to all this information,
-we hope to make it easier for users to write and debug c0 programs.
+we hope to make it easier for users to write and debug C0 programs.
 \par
 For version control, we will use a git repository hosted on GitHub. 
 We will use a Gantt chart, shown later in this proposal, to stay on schedule.
 
 
 \section{Benefits}
-\begin{enumerate}
-\item Write c0 on cement
-\item Write c0.js
-\item Write cQuery
-\item ???????
-\item Profit!
-\end{enumerate}
+\par
+This project will benefit students in 15-122 Principals of Imperative
+Computation at Carnegie Mellon University by helping them create correct
+programs. The C0 Debugger will enable students to understand how their programs
+execute and find where problems originate more easily than with existing tools.
+In addition to debugging, students will have better knowledge for how the
+underlying computation model works when evaluating their code.
+\par
+The C0 Debugger will also enable students to test simple programs with little
+setup, using only a web browser. They will no longer have to set up and become
+familiar with a Unix environment before they can program, making C0 accessible
+to more people.
 
 \section{Approach}
-Use JavaScript and c0.
+Use JavaScript and C0.
 
 \section{Evaluation Criteria}
 Can you c it working, or not?
 
 \section{Qualifications of Team Members}
-We are all c0 experts.
+We are all C0 experts.
 
 \section{Sources Cited}
 TBD
