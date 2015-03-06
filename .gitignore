@@ -30,3 +30,4 @@ node_modules
 #tex stuff
 *.aux
 *.toc
+/proposal/proposal.out
