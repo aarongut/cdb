@@ -10,6 +10,7 @@
 
 \usepackage{graphicx}
 \usepackage{pdfpages}
+\usepackage{hyperref}
 
 % \usepackage[ngerman]{babel}
 % \usepackage[T1]{fontenc}
@@ -76,7 +77,20 @@ This proposal goes over a detailed plan for how our team will create the C0 Debu
 \pagenumbering{arabic}
 
 \section{Introduction}
-I'd like to introduce some things.
+One of Carnegie Mellon University's most widely attended class is 15-122,
+Principles of Imperative Computation. 15-122 contains a capstone assignment
+called the C0 Virtual Machine, which involves implementing a program that
+allows the user to run arbitrary code in the language in which 15-122 is
+taught, C0. The implementation of the virtual machine (C0VM) is not an easy
+task - it involves higher level thinking and a deep understanding of the
+abstractions associated with running arbitrary code. Because it is difficult,
+the CDB (C0 Debugger) hopes to improve the learning process by making
+visualization and interaction with a working implementation of the C0VM more
+accessible to 15-122 students. This involves creating a working Javascript
+version of the C0VM, implementing visualizers for relevant parts of the
+assignment, and developing the interface for student-based interaction with
+the application. With development time and effort, the CDB has the opportunity
+to change the future of imperative computation education.
 
 \section{Literature Review}
 \par
@@ -258,6 +272,14 @@ Mitchell has coded extensively in C, Python, and Haskell.
 % You know I had to say it, right?
 
 \section{Sources Cited}
-TBD
+\begin{enumerate}
+\item Amjad Masad,
+  ``Building an In-Browser JavaScript VM and Debugger Using Generators'',\\
+  http://amasad.me/2014/01/06/building-an-in-browser-javascript-vm-and-debugger-using-generators/
+\item Mike Kamerman, ``The Architecture of Open Source Applications (Volume 2)'',\\
+  http://www.aosabook.org/en/pjs.html
+\item Joyent, Inc., ``Node.js Documentation'', \\
+  http://nodejs.org/documentation
+\end{enumerate}
 
 \end{document}
