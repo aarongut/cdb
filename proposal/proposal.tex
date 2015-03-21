@@ -77,11 +77,11 @@ This proposal goes over a detailed plan for how our team will create the C0 Debu
 \pagenumbering{arabic}
 
 \section{Introduction}
-One of Carnegie Mellon University's most widely attended class is 15-122,
+One of Carnegie Mellon University's most widely attended classes is 15-122,
 Principles of Imperative Computation. 15-122 contains a capstone assignment
 called the C0 Virtual Machine, which involves implementing a program that
-allows the user to run arbitrary code in the language in which 15-122 is
-taught, C0. The implementation of the virtual machine (C0VM) is not an easy
+allows the user to run arbitrary code in C0, the language in which 15-122 is
+taught. The implementation of the virtual machine (C0VM) is not an easy
 task - it involves higher level thinking and a deep understanding of the
 abstractions associated with running arbitrary code. Because it is difficult,
 the CDB (C0 Debugger) hopes to improve the learning process by making
@@ -111,7 +111,7 @@ we plan to use for our project.
   debugged, adding support for stopping, starting, and analyzing the
   program. The debugger was the visual interface to the virtual
   machine, allowing users to control the virtual machine and see its
-  output.
+  output. We may wish to design our project similarly.
   \par
   Masad also discusses challenges he overcame while writing
   debug.js. These included being able to step line-by-line through a
@@ -186,14 +186,14 @@ to more people, more quickly.
 \section{Approach}
 \par
 The approach section contains our methodology, how we plan to implement the
-project, and our project schedule, the timeline we plan to adhere to.  The
+project, our project schedule, and the timeline we plan to adhere to.  The
 methodology outlines the specific tools we will use to complete the project in
 a timely manner whereas the schedule outlines the deadlines by which we hope to
 have certain tasks completed.
 
 \subsection{Methodology}
 The C0 Debugger is designed for the CMU teaching language, C0.  It will be
-hosted on heroku with the website itself designed in CSS and HTML, using
+hosted on Heroku with the website itself designed in CSS and HTML, using
 Node.js to run most of the core functionality.  We will first deploy a blank
 template website after which half of the team will work on parsing C0 bytecode
 and the other half will work on creating a meaningful user experience.  Once
@@ -201,11 +201,11 @@ both teams have made reasonable progress, they will combine the two units to
 complete the basic outline of the project.
 
 \subsection{Project Schedule}
-The project will be separated into five main phases: Basic Website Design,
-Backend implementation, Frontend Implementation, User Testing, and Revisions.
+The project will be separated into five main phases: basic website design,
+backend implementation, frontend implementation, user testing, and revisions.
 The first phase should take less than a week with the
 next two phases occurring simultaneously and composing the rest of the month's
-work.  User implementation and revisions will then hopefully take up the
+work.  User testing and revisions will then take up the
 remainder of the alloted time, with extra time padded in case implementation or
 revisions are more extensive than we have predicted.
 \begin{figure}[h]
@@ -236,7 +236,7 @@ subjects, and they instead provide us with information to improve the user
 experience as a whole.
 \par
 Our main goal is to provide these students with a useful debugging tool, so
-their feedback is invaluable in slowly modifying our project to better suit
+their feedback is invaluable in modifying our project to better suit
 their needs.
 
 \section{Qualifications of Team Members}
@@ -266,9 +266,9 @@ as a teaching assistant for the School of Computer Science for two semesters in
 web applications for real-time resource monitoring. Aaron is very well-versed in
 JavaScript, C, and C0.
 \par
-Mitchell Plamann has had nine years of programming experience.  He has interned
-at Rockwell Automation, doing firmware developement for embedded systems.
-Mitchell has coded extensively in C, Python, and Haskell.
+Mitchell Plamann has had nine years of programming experience.  For the past two
+summers, he interned at Rockwell Automation, doing firmware developement for
+embedded systems. Mitchell has coded extensively in C, C0, and Haskell.
 % You know I had to say it, right?
 
 \section{Sources Cited}
@@ -276,7 +276,7 @@ Mitchell has coded extensively in C, Python, and Haskell.
 \item Amjad Masad,
   ``Building an In-Browser JavaScript VM and Debugger Using Generators'',\\
   http://amasad.me/2014/01/06/building-an-in-browser-javascript-vm-and-debugger-using-generators/
-\item Mike Kamerman, ``The Architecture of Open Source Applications (Volume 2)'',\\
+\item Mike Kamermans, ``The Architecture of Open Source Applications (Volume 2)'',\\
   http://www.aosabook.org/en/pjs.html
 \item Joyent, Inc., ``Node.js Documentation'', \\
   http://nodejs.org/documentation
