@@ -1,0 +1,6 @@
+#use <conio>
+
+int main() {
+  print("Hello, world.\nYou don't look so good.\n");
+  return 0;
+}
