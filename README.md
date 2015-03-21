@@ -1,6 +1,5 @@
 # cdb
 C0 Debugger Woo
-![Logo](logo.png)
 
 ![Logo](logo.png)
 
