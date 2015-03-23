@@ -46,19 +46,20 @@ function execute(file) {
             pc++;
             var y = stack.pop();
             var x = stack.pop();
-            stack.push((x+y) % 0xFF);
+            console.log("Adding " + x + " and " + y);
+            stack.push((x+y) % 0x100);
             break;
         case ISUB:
             pc++;
             var y = stack.pop();
             var x = stack.pop();
-            stack.push((x-y) % 0xFF);
+            stack.push((x-y) % 0x100);
             break;
         case IMUL:
             pc++;
             var y = stack.pop();
             var x = stack.pop();
-            stack.push((x*y) % 0xFF);
+            stack.push((x*y) % 0x100);
             break;
 
         default:
