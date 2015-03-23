@@ -31,3 +31,7 @@ node_modules
 *.aux
 *.toc
 /proposal/proposal.out
+
+#nodejs things
+node_modules
+npm-debug.log
