@@ -1,275 +1,243 @@
-stack = []
-pc = 0;
-program = [];
-variables = [];
+op = require("./opcodes");
 
-function doIf(shouldJump) {
+var ProgramState = function(parsed_file) {
+    var main_function = parsed_file.function_pool[0];
+    
+    this.stack = []
+    this.pc = 0;
+    this.program = main_function.code;
+    this.variables = [];
+    for (var i = 0; i < main_function.num_vars; i++)
+        variables.push(0);
+    this.file = parsed_file;
+}
+
+
+ProgramState.prototype.doIf = function(shouldJump) {
     if (shouldJump) {
-        var address_offset = (program[pc+1] * 0x1000) + program[pc+2];
-        pc += address_offset;
+        var address_offset = (this.program[this.pc+1] * 0x1000) + 
+            this.program[this.pc+2];
+        this.pc += address_offset;
     } else {
-        pc += 3;
+        this.pc += 3;
     }
 }
 
-// Takes in a parsed .bc0 file and runs it
-function execute(file) {
-    console.log("Beginning execution of file " + file);
-    main_function = file.function_pool[0];
-    program = main_function.code;
-    for (var i = 0; i < main_function.num_vars; i++)
-        variables.push(0);
-    while (true) {
-        console.log("Running opcode " + program[pc].toString(16));
-        switch (program[pc]) {
-            // Stack manipulation
-        case POP:
-            pc++;
-            stack.pop();
-            break;
-        case DUP:
-            pc++;
-            var v = stack.pop();
-            stack.push(v);
-            stack.push(v);
-            break;
-        case SWAP:
-            pc++;
-            var v1 = stack.pop();
-            var v2 = stack.pop();
-            stack.push(v1);
-            stack.push(v2);
-            break;
-        case BIPUSH:
-            pc += 2;
-            var val = program[pc-1];
+ProgramState.prototype.step = function() {
+    console.log("Running opcode " + op.lookup_table[this.program[this.pc]]);
+    switch (this.program[this.pc]) {
+        // Stack manipulation
+    case op.POP:
+        this.pc++;
+        this.stack.pop();
+        break;
+    case op.DUP:
+        this.pc++;
+        var v = this.stack.pop();
+        this.stack.push(v);
+        this.stack.push(v);
+        break;
+    case op.SWAP:
+        this.pc++;
+        var v1 = this.stack.pop();
+        var v2 = this.stack.pop();
+        this.stack.push(v1);
+        this.stack.push(v2);
+        break;
+    case op.BIPUSH:
+        this.pc += 2;
+        var val = this.program[this.pc-1];
 
-            // Do sign extension if necessary
-            if (val & 0x80 != 0)
-                val = -0x80 + (val & 0x7F);
-            stack.push(val);
-            break;
+        // Do sign extension if necessary
+        if (val & 0x80 != 0)
+            val = -0x80 + (val & 0x7F);
+        this.stack.push(val);
+        break;
 
-            // Returning from a function
-        case RETURN:
-            var retVal = stack.pop();
-            return retVal;
+        // Returning from a function
+    case op.RETURN:
+        var retVal = this.stack.pop();
+        throw retVal;
 
-            // Arithmetic
-        case IADD:
-            pc++;
-            var y = stack.pop();
-            var x = stack.pop();
-            console.log("Adding " + x + " and " + y);
-            stack.push((x+y) % 0x100000000);
-            break;
-        case ISUB:
-            pc++;
-            var y = stack.pop();
-            var x = stack.pop();
-            stack.push((x-y) % 0x100000000);
-            break;
-        case IMUL:
-            pc++;
-            var y = stack.pop();
-            var x = stack.pop();
-            stack.push((x*y) % 0x100000000);
-            break;
-        case IDIV:
-            pc++;
-            var y = stack.pop();
-            var x = stack.pop();
-            if (y == 0) c0_arith_error("Divide by zero");
-            if (x == INT_MIN && y == -1) c0_arith_error("Arithmetic overflow");
+        // Arithmetic
+    case op.IADD:
+        this.pc++;
+        var y = this.stack.pop();
+        var x = this.stack.pop();
+        console.log("Adding " + x + " and " + y);
+        this.stack.push((x+y) % 0x100000000);
+        break;
+    case op.ISUB:
+        this.pc++;
+        var y = this.stack.pop();
+        var x = this.stack.pop();
+        this.stack.push((x-y) % 0x100000000);
+        break;
+    case op.IMUL:
+        this.pc++;
+        var y = this.stack.pop();
+        var x = this.stack.pop();
+        this.stack.push((x*y) % 0x100000000);
+        break;
+    case op.IDIV:
+        this.pc++;
+        var y = this.stack.pop();
+        var x = this.stack.pop();
+        if (y == 0) c0_arith_error("Divide by zero");
+        if (x == INT_MIN && y == -1) c0_arith_error("Arithmetic overflow");
 
-            // This does int division.
-            // As I understand it, the ~~ is treated as the identity on integers
-            // which forces the type to int, not float
-            stack.push(~~(x/y));
-            break;
-        case IREM:
-            pc++;
-            var y = stack.pop();
-            var x = stack.pop();
-            if (y == 0) c0_arith_error("Divide by zero");
-            if (x == INT_MIN && y == -1) c0_arith_error("Arithmetic overflow");
-            stack.push(x%y);
-            break;
-        case IAND:
-            pc++;
-            var y = stack.pop();
-            var x = stack.pop();
-            stack.push(x&y);
-            break;
-        case IOR:
-            pc++;
-            var y = stack.pop();
-            var x = stack.pop();
-            stack.push(x|y);
-            break;
-        case IXOR:
-            pc++;
-            var y = stack.pop();
-            var x = stack.pop();
-            stack.push(x^y);
-            break;
-        case ISHL:
-            pc++;
-            var y = stack.pop();
-            var x = stack.pop();
-            if (y < 0 || y > 31) c0_arith_error("Shifting by too many bits");
-            stack.push(x<<y);
-            break;
-        case ISHR:
-            pc++;
-            var y = stack.pop();
-            var x = stack.pop();
-            if (y < 0 || y > 31) c0_arith_error("Shifting by too many bits");
-            stack.push(x>>y);
-            break;
+        // This does int division.
+        // As I understand it, the ~~ is treated as the identity on integers
+        // which forces the type to int, not float
+        this.stack.push(~~(x/y));
+        break;
+    case op.IREM:
+        this.pc++;
+        var y = this.stack.pop();
+        var x = this.stack.pop();
+        if (y == 0) c0_arith_error("Divide by zero");
+        if (x == INT_MIN && y == -1) c0_arith_error("Arithmetic overflow");
+        this.stack.push(x%y);
+        break;
+    case op.IAND:
+        this.pc++;
+        var y = this.stack.pop();
+        var x = this.stack.pop();
+        this.stack.push(x&y);
+        break;
+    case op.IOR:
+        this.pc++;
+        var y = this.stack.pop();
+        var x = this.stack.pop();
+        this.stack.push(x|y);
+        break;
+    case op.IXOR:
+        this.pc++;
+        var y = this.stack.pop();
+        var x = this.stack.pop();
+        this.stack.push(x^y);
+        break;
+    case op.ISHL:
+        this.pc++;
+        var y = this.stack.pop();
+        var x = this.stack.pop();
+        if (y < 0 || y > 31) c0_arith_error("Shifting by too many bits");
+        this.stack.push(x<<y);
+        break;
+    case op.ISHR:
+        this.pc++;
+        var y = this.stack.pop();
+        var x = this.stack.pop();
+        if (y < 0 || y > 31) c0_arith_error("Shifting by too many bits");
+        this.stack.push(x>>y);
+        break;
 
-            // Operations on local variables
+        // Operations on local variables
 
-        case VLOAD:
-            pc += 2;
-            var index = program[pc-1];
-            stack.push(variables[index]);
-            break;
-        case VSTORE:
-            pc +=2 ;
-            var index = program[pc-1];
-            variables[index] = stack.pop();
-            break;
-        case ACONST_NULL:
-            pc++;
-            stack.push(0);
-            break;
-        case ILDC:
-            pc += 3;
-            var c1 = program[pc-2];
-            var c2 = program[pc-1];
-            var index = (c1 * 0x1000) + c2;
+    case op.VLOAD:
+        this.pc += 2;
+        var index = this.program[this.pc-1];
+        this.stack.push(this.variables[index]);
+        break;
+    case op.VSTORE:
+        this.pc += 2;
+        var index = this.program[this.pc-1];
+        this.variables[index] = this.stack.pop();
+        break;
+    case op.ACONST_NULL:
+        this.pc++;
+        this.stack.push(0);
+        break;
+    case op.ILDC:
+        this.pc += 3;
+        var c1 = this.program[this.pc-2];
+        var c2 = this.program[this.pc-1];
+        var index = (c1 * 0x1000) + c2;
 
-            stack.push(file.int_pool[index]);
-            break;
-        case ALDC:
-            console.log("Error: I don't know how to handle ALDC yet");
-            return;
+        this.stack.push(this.file.int_pool[index]);
+        break;
+    case op.ALDC:
+        console.log("Error: I don't know how to handle ALDC yet");
+        throw "Error - can't handle ALDC";
 
-            // Control flow
-        case NOP:
-            pc++;
-            break;
-        case IF_CMPEQ:
-            var y = stack.pop();
-            var x = stack.pop();
-            doIf(y == x);
-            break;
-        case IF_CMPNE:
-            var y = stack.pop();
-            var x = stack.pop();
-            doIf(y != x);
-            break;
-        case IF_CMPLT:
-            var y = stack.pop();
-            var x = stack.pop();
-            doIf(y > x);
-            break;
-        case IF_CMPGE:
-            var y = stack.pop();
-            var x = stack.pop();
-            doIf(y <= x);
-            break;
-        case IF_CMPGT:
-            var y = stack.pop();
-            var x = stack.pop();
-            doIf(y < x);
-            break;
-        case IF_CMPLE:
-            var y = stack.pop();
-            var x = stack.pop();
-            doIf(y >= x);
-            break;
-        case GOTO:
-            doIf(true);
-            break;
-        case ATHROW:
-            pc++;
-            c0_user_error(stack.pop());
-            break;
-        case ASSERT:
-            pc++;
-            var a = stack.pop();
-            if (stack.pop() == 0)
-                c0_assertion_failure(a);
-            break;
+        // Control flow
+    case op.NOP:
+        this.pc++;
+        break;
+    case op.IF_CMPEQ:
+        var y = this.stack.pop();
+        var x = this.stack.pop();
+        this.doIf(y == x);
+        break;
+    case op.IF_CMPNE:
+        var y = this.stack.pop();
+        var x = this.stack.pop();
+        this.doIf(y != x);
+        break;
+    case op.IF_CMPLT:
+        var y = this.stack.pop();
+        var x = this.stack.pop();
+        this.doIf(y > x);
+        break;
+    case op.IF_CMPGE:
+        var y = this.stack.pop();
+        var x = this.stack.pop();
+        this.doIf(y <= x);
+        break;
+    case op.IF_CMPGT:
+        var y = this.stack.pop();
+        var x = this.stack.pop();
+        this.doIf(y < x);
+        break;
+    case op.IF_CMPLE:
+        var y = this.stack.pop();
+        var x = this.stack.pop();
+        this.doIf(y >= x);
+        break;
+    case op.GOTO:
+        this.doIf(true);
+        break;
+    case op.ATHROW:
+        this.pc++;
+        c0_user_error(this.stack.pop());
+        break;
+    case op.ASSERT:
+        this.pc++;
+        var a = this.stack.pop();
+        if (this.stack.pop() == 0)
+            c0_assertion_failure(a);
+        break;
 
-        default:
-            console.log("Error: Unknown opcode\n");
-            return;
-        }
+    default:
+        console.log("Error: Unknown opcode\n");
+        throw "Error - unknown opcode";
     }
+    return false;
+}
+
+// Takes in a parsed .bc0 file and runs it
+function execute(f) {
+    console.log("Beginning execution of file " + f);
+
+    var state = new ProgramState(f);
+    
+    while (true) {
+        // I'm not sure how to structure this control flow yet,
+        // so if anyone has a better idea, let me know
+        try {
+            state.step();
+        } catch (val) {
+            return val;
+        }
+
+        // if (at_breakpoint) {
+        //   save state (maybe in a global in this file?)
+        //   return;
+        // }
+    }        
 }
 
 exports.execute = execute;
 
 // opcode definitions
 
-/* arithmetic operations */
-IADD = 0x60;
-IAND = 0x7E;
-IDIV = 0x6C;
-IMUL = 0x68;
-IOR = 0x80;
-IREM = 0x70;
-ISHL = 0x78;
-ISHR = 0x7A;
-ISUB = 0x64;
-IXOR = 0x82;
-
-/* stack operations */
-DUP = 0x59;
-POP = 0x57;
-SWAP = 0x5F;
-
-/* memory allocation */
-NEWARRAY = 0xBC;
-ARRAYLENGTH = 0xBE;
-NEW = 0xBB;
-
-/* memory access */
-AADDF = 0x62;
-AADDS = 0x63;
-IMLOAD = 0x2E;
-AMLOAD = 0x2F;
-IMSTORE = 0x4E;
-AMSTORE = 0x4F;
-CMLOAD = 0x34;
-CMSTORE = 0x55;
-
-/* local variables */
-VLOAD = 0x15;
-VSTORE = 0x36;
-
-/* constants */
-ACONST_NULL = 0x01;
-BIPUSH = 0x10;
-ILDC = 0x13;
-ALDC = 0x14;
-
-/* control flow */
-NOP = 0x00;
-IF_CMPEQ = 0x9F;
-IF_CMPNE = 0xA0;
-IF_ICMPLT = 0xA1;
-IF_ICMPGE = 0xA2;
-IF_ICMPGT = 0xA3;
-IF_ICMPLE = 0xA4;
-GOTO = 0xA7;
-ATHROW = 0xBF;
-ASSERT = 0xCF;
-
-/* function calls and returns */
-INVOKESTATIC = 0xB8;
-INVOKENATIVE = 0xB7;
-RETURN = 0xB0
