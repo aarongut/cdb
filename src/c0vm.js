@@ -1,8 +1,15 @@
 op = require("./opcodes");
 
+var INT_MIN = 0x80000000;
+var INT_MAX = 0x7FFFFFFF;
+
 var verbose = false;
 function log(message) {
     if (verbose) console.log(message);
+}
+
+function c0_assertion_failure(val) {
+    throw "c0 assertion failure: " + val;
 }
 
 var StackFrame = function(file, f) {
@@ -12,7 +19,7 @@ var StackFrame = function(file, f) {
     this.program = f.code;
     this.variables = [];
     for (var i = 0; i < f.num_vars; i++)
-        variables.push(0);
+        this.variables.push(0);
     this.file = file;
 }
 
@@ -21,7 +28,7 @@ var ProgramState = function(parsed_file) {
     var main_function = parsed_file.function_pool[0];
 
     this.frame = new StackFrame(parsed_file, parsed_file.function_pool[0]);
-    this.call_stack = [this.frame];
+    this.call_stack = [];
     this.file = parsed_file;
 }
 
@@ -33,13 +40,23 @@ ProgramState.prototype.pop = function() {
     return this.frame.stack.pop();
 }
 
+ProgramState.prototype.goto_offset = function() {
+    var c1 = this.frame.program[this.frame.pc+1];
+    var c2 = this.frame.program[this.frame.pc+2]
+
+    var address_offset = (c1 << 8) + c2;
+    // Handle negative values
+    if ((address_offset & 0x8000) != 0)
+        address_offset = -0x8000 + (address_offset & 0x7FFF);
+
+    this.frame.pc += address_offset;
+}
+
 ProgramState.prototype.doIf = function(f) {
     var y = this.pop();
     var x = this.pop();
     if (f(x,y)) {
-        var address_offset = (this.frame.program[this.frame.pc+1] * 0x1000) + 
-            this.frame.program[this.frame.pc+2];
-        this.frame.pc += address_offset;
+        this.goto_offset();
     } else {
         this.frame.pc += 3;
     }
@@ -47,7 +64,7 @@ ProgramState.prototype.doIf = function(f) {
 
 ProgramState.prototype.step = function() {
     var opcode = this.frame.program[this.frame.pc]
-    log("Running opcode " +
+    log("0x" + this.frame.pc.toString(16) + " Running opcode " +
         op.lookup_table[opcode]);
     switch (opcode) {
         // Stack manipulation
@@ -81,8 +98,13 @@ ProgramState.prototype.step = function() {
         // Returning from a function
     case op.RETURN:
         var retVal = this.pop();
-        throw retVal;
+        if (this.call_stack.length == 0)
+            throw retVal;
 
+        this.frame = this.call_stack.pop();
+        this.push(retVal);
+
+        break;
         // Arithmetic
     case op.IADD:
         this.frame.pc++;
@@ -200,20 +222,20 @@ ProgramState.prototype.step = function() {
     case op.IF_CMPNE:
         this.doIf(function (x,y) {return y != x;});
         break;
-    case op.IF_CMPLT:
+    case op.IF_ICMPLT:
         this.doIf(function (x,y) {return y > x;});
         break;
-    case op.IF_CMPGE:
+    case op.IF_ICMPGE:
         this.doIf(function (x,y) {return y <= x;});
         break;
-    case op.IF_CMPGT:
+    case op.IF_ICMPGT:
         this.doIf(function (x,y) {return y < x;});
         break;
-    case op.IF_CMPLE:
+    case op.IF_ICMPLE:
         this.doIf(function (x,y) {return y >= x;});
         break;
     case op.GOTO:
-        this.doIf(function (x,y) {return true;});
+        this.goto_offset();
         break;
     case op.ATHROW:
         this.frame.pc++;
@@ -226,8 +248,34 @@ ProgramState.prototype.step = function() {
             c0_assertion_failure(a);
         break;
 
+        // Function call operations
+
+    case op.INVOKESTATIC:
+        var c1 = this.frame.program[this.frame.pc+1];
+        var c2 = this.frame.program[this.frame.pc+2];
+        this.frame.pc += 3;
+
+        var index = (c1 << 8) + c2;
+
+        var f = this.file.function_pool[index];
+        var newFrame = new StackFrame(this.file, f);
+        for (var i = f.num_args - 1; i >= 0; i--) {
+            newFrame.variables[i] = this.pop();
+        }
+
+        this.call_stack.push(this.frame);
+        this.frame = newFrame;
+        break;
+
     default:
-        console.log("Error: Unknown opcode: 0x" + opcode.toString(16) + "\n");
+        var opcode_name;
+        try {
+            opcode_name = op.lookup_table[opcode];
+        } catch (ignored) {
+            opcode_name = "UNKNOWN";
+        }
+        console.log("Error: Unknown opcode: 0x" + opcode.toString(16) +
+                    " (" + opcode_name + ")\n");
         throw "Error - unknown opcode";
     }
     return false;

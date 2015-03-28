@@ -1,0 +1,36 @@
+C0 C0 FF EE       # magic number
+00 09             # version 4, arch = 1 (64 bits)
+
+00 00             # int pool count
+# int pool
+
+00 00             # string pool total size
+# string pool
+
+00 01             # function count
+# function_pool
+
+#<main>
+00 00             # number of arguments = 0
+00 01             # number of local variables = 1
+00 1C             # code length = 28 bytes
+10 04    # bipush 4        # 4
+36 00    # vstore 0        # x = 4;
+15 00    # vload 0         # x
+10 03    # bipush 3        # 3
+A1 00 06 # if_icmplt +6    # if (x < 3) goto <00:then>
+A7 00 0A # goto +10        # goto <01:else>
+# <00:then>
+10 17    # bipush 23       # 23
+36 00    # vstore 0        # x = 23;
+A7 00 07 # goto +7         # goto <02:endif>
+# <01:else>
+10 20    # bipush 32       # 32
+36 00    # vstore 0        # x = 32;
+# <02:endif>
+15 00    # vload 0         # x
+B0       # return          # 
+
+00 00             # native count
+# native pool
+

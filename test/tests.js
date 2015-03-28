@@ -3,12 +3,17 @@ c0vm = require("../src/c0vm.js")
 
 var callbacks = {}
 
-// Tests that IADD, BIPUSH, and RETURN (from main) work
-exports.testIADD = function(test) {
-    var result = c0vm.execute(parser.parse("iadd.c0.bc0"), callbacks, false);
-    test.ok(result == -2, "iadd.c0.bc0 - Error in IADD, BIPUSH, or RETURN");
-    test.done();
-};
+function doTest(filename, expected_result) {
+    return function(test) {
+        var result = c0vm.execute(parser.parse(filename), callbacks, false);
+        test.ok(result == expected_result,
+                filename + " - did not get expected result " + expected_result +
+               ", instead got " + result);
+        test.done();
+    }
+}
+
+exports.testIADD = doTest("iadd.c0.bc0", -2);
 
 exports.testPrint = function(test) {
     var result = c0vm.execute(parser.parse("test.bc0"), callbacks, false);
@@ -16,8 +21,19 @@ exports.testPrint = function(test) {
     test.done();
 }
 
-exports.testISHR = function(test) {
-    var result = c0vm.execute(parser.parse("ishr.c0.bc0"), callbacks, false);
-    test.ok(result == -1, "ishr.c0.bc0 - -1 >> 1 gave " + result + ", not -1");
+exports.testISHR = doTest("ishr.c0.bc0", -1);
+
+exports.testISQRT = doTest("isqrt.c0.bc0", 122);
+
+exports.testMID = doTest("mid.c0.bc0", 155);
+
+// This one should throw an exception because an assertion fails
+exports.testSample25 = function(test) {
+    test.throws(c0vm.execute(parser.parse("sample2.5.c0.bc0"), callbacks, false));
     test.done();
 }
+
+exports.testIF = doTest("testif.c0.bc0", 32);
+
+exports.testDSQUARED = doTest("dsquared.c0.bc0", 17068);
+    
