@@ -307,6 +307,3 @@ function execute(file, callbacks, v) {
 }
 
 exports.execute = execute;
-
-// opcode definitions
-
