@@ -1,225 +1,246 @@
 op = require("./opcodes");
 
-var ProgramState = function(parsed_file) {
-    var main_function = parsed_file.function_pool[0];
-    
-    this.stack = []
+var verbose = false;
+function log(message) {
+    if (verbose) console.log(message);
+}
+
+var StackFrame = function(file, f) {
+    log("Creating stack frame");
+    this.stack = [];
     this.pc = 0;
-    this.program = main_function.code;
+    this.program = f.code;
     this.variables = [];
-    for (var i = 0; i < main_function.num_vars; i++)
+    for (var i = 0; i < f.num_vars; i++)
         variables.push(0);
+    this.file = file;
+}
+
+var ProgramState = function(parsed_file) {
+    log("Creating program state with file " + parsed_file);
+    var main_function = parsed_file.function_pool[0];
+
+    this.frame = new StackFrame(parsed_file, parsed_file.function_pool[0]);
+    this.call_stack = [this.frame];
     this.file = parsed_file;
 }
 
+ProgramState.prototype.push = function(val) {
+    this.frame.stack.push(val);
+}
 
-ProgramState.prototype.doIf = function(shouldJump) {
-    if (shouldJump) {
-        var address_offset = (this.program[this.pc+1] * 0x1000) + 
-            this.program[this.pc+2];
-        this.pc += address_offset;
+ProgramState.prototype.pop = function() {
+    return this.frame.stack.pop();
+}
+
+ProgramState.prototype.doIf = function(f) {
+    var y = this.pop();
+    var x = this.pop();
+    if (f(x,y)) {
+        var address_offset = (this.frame.program[this.frame.pc+1] * 0x1000) + 
+            this.frame.program[this.frame.pc+2];
+        this.frame.pc += address_offset;
     } else {
-        this.pc += 3;
+        this.frame.pc += 3;
     }
 }
 
 ProgramState.prototype.step = function() {
-    console.log("Running opcode " + op.lookup_table[this.program[this.pc]]);
-    switch (this.program[this.pc]) {
+    var opcode = this.frame.program[this.frame.pc]
+    log("Running opcode " +
+        op.lookup_table[opcode]);
+    switch (opcode) {
         // Stack manipulation
     case op.POP:
-        this.pc++;
-        this.stack.pop();
+        this.frame.pc++;
+        this.pop();
         break;
     case op.DUP:
-        this.pc++;
-        var v = this.stack.pop();
-        this.stack.push(v);
-        this.stack.push(v);
+        this.frame.pc++;
+        var v = this.pop();
+        this.push(v);
+        this.push(v);
         break;
     case op.SWAP:
-        this.pc++;
-        var v1 = this.stack.pop();
-        var v2 = this.stack.pop();
-        this.stack.push(v1);
-        this.stack.push(v2);
+        this.frame.pc++;
+        var v1 = this.pop();
+        var v2 = this.pop();
+        this.push(v1);
+        this.push(v2);
         break;
     case op.BIPUSH:
-        this.pc += 2;
-        var val = this.program[this.pc-1];
-
+        this.frame.pc += 2;
+        var val = this.frame.program[this.frame.pc-1];
+        
         // Do sign extension if necessary
-        if (val & 0x80 != 0)
+        if ((val & 0x80) != 0)
             val = -0x80 + (val & 0x7F);
-        this.stack.push(val);
+        this.push(val);
         break;
 
         // Returning from a function
     case op.RETURN:
-        var retVal = this.stack.pop();
+        var retVal = this.pop();
         throw retVal;
 
         // Arithmetic
     case op.IADD:
-        this.pc++;
-        var y = this.stack.pop();
-        var x = this.stack.pop();
-        console.log("Adding " + x + " and " + y);
-        this.stack.push((x+y) % 0x100000000);
+        this.frame.pc++;
+        var y = this.pop();
+        var x = this.pop();
+        log("Adding " + x + " and " + y);
+        this.push((x+y) % 0x100000000);
         break;
     case op.ISUB:
-        this.pc++;
-        var y = this.stack.pop();
-        var x = this.stack.pop();
-        this.stack.push((x-y) % 0x100000000);
+        this.frame.pc++;
+        var y = this.pop();
+        var x = this.pop();
+        this.push((x-y) % 0x100000000);
         break;
     case op.IMUL:
-        this.pc++;
-        var y = this.stack.pop();
-        var x = this.stack.pop();
-        this.stack.push((x*y) % 0x100000000);
+        this.frame.pc++;
+        var y = this.pop();
+        var x = this.pop();
+        this.push((x*y) % 0x100000000);
         break;
     case op.IDIV:
-        this.pc++;
-        var y = this.stack.pop();
-        var x = this.stack.pop();
+        this.frame.pc++;
+        var y = this.pop();
+        var x = this.pop();
         if (y == 0) c0_arith_error("Divide by zero");
         if (x == INT_MIN && y == -1) c0_arith_error("Arithmetic overflow");
 
         // This does int division.
         // As I understand it, the ~~ is treated as the identity on integers
         // which forces the type to int, not float
-        this.stack.push(~~(x/y));
+        this.push(~~(x/y));
         break;
     case op.IREM:
-        this.pc++;
-        var y = this.stack.pop();
-        var x = this.stack.pop();
+        this.frame.pc++;
+        var y = this.pop();
+        var x = this.pop();
         if (y == 0) c0_arith_error("Divide by zero");
         if (x == INT_MIN && y == -1) c0_arith_error("Arithmetic overflow");
-        this.stack.push(x%y);
+        this.push(x%y);
         break;
     case op.IAND:
-        this.pc++;
-        var y = this.stack.pop();
-        var x = this.stack.pop();
-        this.stack.push(x&y);
+        this.frame.pc++;
+        var y = this.pop();
+        var x = this.pop();
+        this.push(x&y);
         break;
     case op.IOR:
-        this.pc++;
-        var y = this.stack.pop();
-        var x = this.stack.pop();
-        this.stack.push(x|y);
+        this.frame.pc++;
+        var y = this.pop();
+        var x = this.pop();
+        this.push(x|y);
         break;
     case op.IXOR:
-        this.pc++;
-        var y = this.stack.pop();
-        var x = this.stack.pop();
-        this.stack.push(x^y);
+        this.frame.pc++;
+        var y = this.pop();
+        var x = this.pop();
+        this.push(x^y);
         break;
     case op.ISHL:
-        this.pc++;
-        var y = this.stack.pop();
-        var x = this.stack.pop();
+        this.frame.pc++;
+        var y = this.pop();
+        var x = this.pop();
         if (y < 0 || y > 31) c0_arith_error("Shifting by too many bits");
-        this.stack.push(x<<y);
+        this.push(x<<y);
         break;
     case op.ISHR:
-        this.pc++;
-        var y = this.stack.pop();
-        var x = this.stack.pop();
+        this.frame.pc++;
+        var y = this.pop();
+        var x = this.pop();
+        console.log("y="+y+", x="+x);
         if (y < 0 || y > 31) c0_arith_error("Shifting by too many bits");
-        this.stack.push(x>>y);
+        this.push(x>>y);
         break;
 
         // Operations on local variables
 
     case op.VLOAD:
-        this.pc += 2;
-        var index = this.program[this.pc-1];
-        this.stack.push(this.variables[index]);
+        this.frame.pc += 2;
+        var index = this.frame.program[this.frame.pc-1];
+        this.push(this.frame.variables[index]);
         break;
     case op.VSTORE:
-        this.pc += 2;
-        var index = this.program[this.pc-1];
-        this.variables[index] = this.stack.pop();
+        this.frame.pc += 2;
+        var index = this.frame.program[this.frame.pc-1];
+        this.frame.variables[index] = this.pop();
         break;
     case op.ACONST_NULL:
-        this.pc++;
-        this.stack.push(0);
+        this.frame.pc++;
+        this.push(0);
         break;
     case op.ILDC:
-        this.pc += 3;
-        var c1 = this.program[this.pc-2];
-        var c2 = this.program[this.pc-1];
+        this.frame.pc += 3;
+        var c1 = this.frame.program[this.frame.pc-2];
+        var c2 = this.frame.program[this.frame.pc-1];
         var index = (c1 * 0x1000) + c2;
 
-        this.stack.push(this.file.int_pool[index]);
+        this.push(this.file.int_pool[index]);
         break;
     case op.ALDC:
-        console.log("Error: I don't know how to handle ALDC yet");
-        throw "Error - can't handle ALDC";
+        this.frame.pc += 3;
+        var c1 = this.frame.program[this.frame.pc-2];
+        var c2 = this.frame.program[this.frame.pc-1];
+        var index = (c1 * 0x1000) + c2;
+
+        this.push(this.file.string_pool[index]);
+        break;
 
         // Control flow
     case op.NOP:
-        this.pc++;
+        this.frame.pc++;
         break;
     case op.IF_CMPEQ:
-        var y = this.stack.pop();
-        var x = this.stack.pop();
-        this.doIf(y == x);
+        this.doIf(function (x,y) {return y == x;});
         break;
     case op.IF_CMPNE:
-        var y = this.stack.pop();
-        var x = this.stack.pop();
-        this.doIf(y != x);
+        this.doIf(function (x,y) {return y != x;});
         break;
     case op.IF_CMPLT:
-        var y = this.stack.pop();
-        var x = this.stack.pop();
-        this.doIf(y > x);
+        this.doIf(function (x,y) {return y > x;});
         break;
     case op.IF_CMPGE:
-        var y = this.stack.pop();
-        var x = this.stack.pop();
-        this.doIf(y <= x);
+        this.doIf(function (x,y) {return y <= x;});
         break;
     case op.IF_CMPGT:
-        var y = this.stack.pop();
-        var x = this.stack.pop();
-        this.doIf(y < x);
+        this.doIf(function (x,y) {return y < x;});
         break;
     case op.IF_CMPLE:
-        var y = this.stack.pop();
-        var x = this.stack.pop();
-        this.doIf(y >= x);
+        this.doIf(function (x,y) {return y >= x;});
         break;
     case op.GOTO:
-        this.doIf(true);
+        this.doIf(function (x,y) {return true;});
         break;
     case op.ATHROW:
-        this.pc++;
-        c0_user_error(this.stack.pop());
+        this.frame.pc++;
+        c0_user_error(this.pop());
         break;
     case op.ASSERT:
-        this.pc++;
-        var a = this.stack.pop();
-        if (this.stack.pop() == 0)
+        this.frame.pc++;
+        var a = this.pop();
+        if (this.pop() == 0)
             c0_assertion_failure(a);
         break;
 
     default:
-        console.log("Error: Unknown opcode\n");
+        console.log("Error: Unknown opcode: 0x" + opcode.toString(16) + "\n");
         throw "Error - unknown opcode";
     }
     return false;
 }
 
 // Takes in a parsed .bc0 file and runs it
-function execute(f) {
-    console.log("Beginning execution of file " + f);
+function execute(file, callbacks, v) {
+    verbose = typeof v !== 'undefined' ? v : true;
+    log("Initializing with file " + file);
 
-    var state = new ProgramState(f);
+    var state = new ProgramState(file);
+
+    log("Beginning execution");
     
     while (true) {
         // I'm not sure how to structure this control flow yet,

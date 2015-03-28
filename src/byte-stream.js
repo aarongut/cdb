@@ -1,5 +1,4 @@
 var ByteStream = function (byte_array) {
-    console.log("Instance created.");
     this.byte_array = byte_array;
     this.index = 0;
 };
