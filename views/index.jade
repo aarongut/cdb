@@ -3,6 +3,50 @@ extends base
 block head
   title c0db
 
+  link(rel="stylesheet" href="/codemirror.css")
+
+
+block nav
+  +navbar("home")
+
 block body
-  div.jumbotron c0db
+  .container
+    .col-md-6
+      form
+        .form-group
+          label(for="inputCode") Code
+          #codearea
+          textarea.code.formControl.sh_c(rows="12" id="inputCode")
+          button(onclick="compile()" type="button").btn.btn-default.btm-btn.pull-right Compile
+
+    .col-md-6
+      p.lbl.
+         Bytecode
+      pre#bytecode.panel.panel-default.code.clearfix.sh_c.
+         &nbsp;
+  
+block script
+  script(type="text/javascript" src="codemirror-compressed.js")
+
+  script(type='text/javascript').
+    var cmCodeInput = CodeMirror.fromTextArea($("#inputCode"));
+
+    function callback(data) {
+      $("#bytecode").text(decodeURIComponent(data.data));
+    }
+
+    function compile() {
+      var code = encodeURIComponent($("#inputCode").val());
+
+      $.ajax({
+              type: "POST",
+              async: true,
+              url: "http://www.contrib.andrew.cmu.edu/~amgutier/cc0.cgi",
+              dataType: "jsonp",
+              data: {
+                data: code
+              },
+              jsonpCallback: "callback"
+      });
+    }
 
