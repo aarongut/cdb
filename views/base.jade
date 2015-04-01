@@ -5,18 +5,22 @@ html
 
     link(rel="stylesheet"
          href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css")
-    
+    link(rel="stylesheet" href="/site.css")
+
+    link(rel="stylesheet" href="sh_emacs.min.css")
+
     block head
 
   body
+    include mixins/navbar
+    block nav
+
 
     block body
-  
+
     script(type="text/javascript"
            src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js")
     script(type="text/javascript"
            src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js")
 
-
     block script
-
