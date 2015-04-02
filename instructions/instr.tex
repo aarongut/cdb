@@ -36,11 +36,11 @@ Instructions
 \section{Overview}
 GitHub provides a great tool for multi-user collaboration on software projects.
 On top of the version control features, GitHub offers sophisticated issue
-tracking integrated right in with the repository.  Tracking issues makes it easy
-to keep track of bugs, new feature ideas, and feedback from testers, all of
-which help keep your project organized.  In the next five steps, you will learn
-how to create a new issues, assign an issue to a contributor, and mark an issue
-as resolved.
+tracking integrated right in with all of your repositories.  Tracking issues
+makes it easy to keep track of bugs, new feature ideas, and feedback from
+testers, all of which help keep your project organized.  In the next five
+steps, you will learn how to create a new issues, assign an issue to a
+contributor, and mark an issue as resolved.
 
 This tutorial is for GitHub users who know how to create and use repositories,
 but are unfamiliar with GitHub's issue tracking features. You need to have an
@@ -76,7 +76,7 @@ fill in necessary information}
 \item Enter in a title for the issue (1, Fig \ref{fig:issue_info})
 \item Enter in a description for the issue (2, Fig \ref{fig:issue_info})
 \item Click ``Submit new issue'' (3, Fig \ref{fig:issue_info})
-\item Step 3 will go over how to add a label to your newly-created issue.
+\item Continue to step 3, where you will add a label to your newly-created issue.
 \end{enumerate}
 
 \begin{figure}[h]
@@ -135,10 +135,11 @@ fill in necessary information}
 
 \begin{enumerate}
 \item On the issue web page, you can see the issue number.
-  In our example, our issue is \#3 (Fig \ref{fig:issue_number}).
-\item Make a commit including the changes that fix the issue.
-  In the commit message, include the text ``Resolves \#N'', replacing ``N'' with your issue number.
-  In the example issue, the commit message would be ``Resolves \#3''.
+  For our example, it is \#3 (Fig \ref{fig:issue_number}).
+\item Using your git client on your computer, make a commit as you normally
+  would including the changes that fix the issue.  In the commit message,
+  include the text ``Resolves \#{\it N}'', replacing {\it N} with your issue number.  In
+  the example issue, the commit message would be ``Resolves \#3''.
 \item GitHub detects this commit and marks the issue as closed (Fig \ref{fig:resolved}).
   At this point, you have successfully created a GitHub issue, fixed the problem in the repository,
   and marked the issue as resolved.
