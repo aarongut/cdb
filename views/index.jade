@@ -15,9 +15,9 @@ block body
       form
         .form-group
           label(for="inputCode") Code
+          button(onclick="compile()" type="button").btn.btn-default.btm-btn.pull-right Compile
           #codearea
           textarea.code.formControl.sh_c(rows="12" id="inputCode")
-          button(onclick="compile()" type="button").btn.btn-default.btm-btn.pull-right Compile
 
     .col-md-6
       p.lbl.
