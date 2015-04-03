@@ -2,7 +2,9 @@ fs = require("fs");
 byte_stream = require("./byte-stream");
 
 // This is a simple, kinda hacky bytecode parser for .bc0 files
-function getBytes(filename) {
+// Now takes in raw bytecode
+function getBytes(data) {
+  /*
     var data = fs.readFileSync(filename);
     
     if (data == null) {
@@ -12,6 +14,7 @@ function getBytes(filename) {
             console.log("Error: " + err);
         return;
     }
+    */
 
     // Data contains our file, but we want it as a string
     var string_data = data.toString();
@@ -29,6 +32,7 @@ function getBytes(filename) {
         });
 
     // We now have an array of bytes. That's probably everything we need, right?
+    console.log(bytes);
     return bytes;
 
 }

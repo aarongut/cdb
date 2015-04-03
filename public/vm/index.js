@@ -9,5 +9,7 @@ c0vm = require("./c0vm.js");
 // console.log(file);
 // console.log(file.function_pool[0].code);
 
-var file = parser.parse("../test/iadd.c0.bc0");
-console.log("Result is " + c0vm.execute(file));
+$("#run").click(function() {
+  var file = parser.parse($("#bytecode").text);
+  $("#output").text(c0vm.execute(file));
+});

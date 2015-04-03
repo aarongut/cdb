@@ -11,22 +11,32 @@ block nav
 
 block body
   .container
-    .col-md-6
-      form
-        .form-group
-          label(for="inputCode") Code
-          button(onclick="compile()" type="button").btn.btn-default.btm-btn.pull-right Compile
-          #codearea
-          textarea.code.formControl.sh_c(rows="12" id="inputCode")
+    .row
+      .col-md-6
+        form
+          .form-group
+            label(for="inputCode") Code
+            button(onclick="compile()" type="button").btn.btn-default.btm-btn.pull-right Compile
+            #codearea
+            textarea.code.formControl.sh_c(rows="12" id="inputCode")
+ 
+      .col-md-6
+        p.lbl.
+           Bytecode
+        pre#bytecode.panel.panel-default.code.sh_c.
+           &nbsp;
+    .row
+      .col-md-12
+        p.lbl.
+          Output
+        button(type="button")#run.btn.btn-default.btm-btn.pull-right Run
+        pre#output.panel.panel-default.code
+          &nbsp;
 
-    .col-md-6
-      p.lbl.
-         Bytecode
-      pre#bytecode.panel.panel-default.code.clearfix.sh_c.
-         &nbsp;
   
 block script
   script(type="text/javascript" src="codemirror-compressed.js")
+  script(type="text/javascript" src="vm/vm.js")
 
   script(type='text/javascript').
     var cmCodeInput = CodeMirror.fromTextArea($("#inputCode"));
@@ -49,4 +59,3 @@ block script
               jsonpCallback: "callback"
       });
     }
-
