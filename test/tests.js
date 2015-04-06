@@ -1,7 +1,21 @@
-parser = require("../src/bytecode-parser.js")
-c0vm = require("../src/c0vm.js")
+parser = require("../src/bytecode-parser.js");
+c0vm = require("../src/c0vm.js");
+c0ffi = require("../src/c0ffi.js");
 
 var callbacks = {}
+var printout = "";
+
+callbacks[c0ffi.NATIVE_PRINT] = function(args) {
+    printout += args[0];
+}
+
+callbacks[c0ffi.NATIVE_PRINTINT] = function(args) {
+    printout += args[0];
+}
+
+callbacks[c0ffi.NATIVE_PRINTLN] = function(args) {
+    printout += (args[0] + "\n");
+}
 
 function doTest(filename, expected_result) {
     return function(test) {
@@ -16,8 +30,10 @@ function doTest(filename, expected_result) {
 exports.testIADD = doTest("iadd.c0.bc0", -2);
 
 exports.testPrint = function(test) {
+    printout = "";
     var result = c0vm.execute(parser.parse("test.bc0"), callbacks, false);
-    test.ok(result == 0, "test.bc0 - Did not print to screen correctly");
+    test.ok(printout == "Hello, world.\nYou don't look so good.\n",
+            "test.bc0 - Did not print to screen correctly: output was " + printout);
     test.done();
 }
 
@@ -29,7 +45,9 @@ exports.testMID = doTest("mid.c0.bc0", 155);
 
 // This one should throw an exception because an assertion fails
 exports.testSample25 = function(test) {
-    test.throws(c0vm.execute(parser.parse("sample2.5.c0.bc0"), callbacks, false));
+    test.throws(function () {
+        c0vm.execute(parser.parse("sample2.5.c0.bc0"), callbacks, false)
+    });
     test.done();
 }
 
@@ -38,13 +56,18 @@ exports.testIF = doTest("testif.c0.bc0", 32);
 exports.testDSQUARED = doTest("dsquared.c0.bc0", 17068);
     
 exports.testArrays = function(test) {
-    var result = c0vm.execute(parser.parse("arrays.c0.bc0"), callbacks, false);
-    test.ok(false, "test.bc0 - Did not print to screen correctly");
+    test.throws(function () {
+        c0vm.execute(parser.parse("arrays.c0.bc0"), callbacks, true)
+    });
     test.done();
 }
 
 exports.testStructs = function(test) {
+    printout = "";
     var result = c0vm.execute(parser.parse("structs.c0.bc0"), callbacks, false);
-    test.ok(false, "test.bc0 - Did not print to screen correctly");
+    test.ok(printout == "expected result here",
+            "structs.c0.bc0 - Did not print to screen correctly, result was " + 
+            printout);
     test.done();
 }
+

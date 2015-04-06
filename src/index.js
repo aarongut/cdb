@@ -1,5 +1,6 @@
 parser = require("./bytecode-parser");
 c0vm = require("./c0vm.js");
+c0ffi = require("./c0ffi.js");
 
 // console.log("Reading in sample bytecode file:");
 // console.log(parser.getBytes("../test/test.bc0"));
@@ -9,5 +10,14 @@ c0vm = require("./c0vm.js");
 // console.log(file);
 // console.log(file.function_pool[0].code);
 
-var file = parser.parse("../test/iadd.c0.bc0");
-console.log("Result is " + c0vm.execute(file));
+callbacks = {};
+callbacks[c0ffi.NATIVE_PRINT] = function(args) {
+    console.log("Print function says: " + args[0]);
+}
+callbacks["printint"] = function(args) {
+    console.log("Printint function says: " + args[0]);
+}
+
+var file = parser.parse("../test/sample2.5.c0.bc0");
+console.log("Result is " + c0vm.execute(file, callbacks));
+

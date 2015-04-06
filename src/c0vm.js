@@ -9,7 +9,11 @@ function log(message) {
 }
 
 function c0_assertion_failure(val) {
-    throw "c0 assertion failure: " + val;
+    throw ("c0 assertion failure: " + val);
+}
+
+function c0_memory_error(val) {
+    throw ("c0 memory error: " + val);
 }
 
 var StackFrame = function(file, f) {
@@ -23,7 +27,7 @@ var StackFrame = function(file, f) {
     this.file = file;
 }
 
-var ProgramState = function(parsed_file) {
+var ProgramState = function(parsed_file, callback_dict) {
     log("Creating program state with file " + parsed_file);
     var main_function = parsed_file.function_pool[0];
 
@@ -31,6 +35,19 @@ var ProgramState = function(parsed_file) {
     this.call_stack = [];
     this.file = parsed_file;
 
+    this.natives = {};
+
+    for (var i = 0; i < 95; i++) {
+        try {
+            this.natives[i] = callback_dict[i];
+        } catch (key_not_found) {
+            dict[i] = function (arg) { 
+                console.log("Native function " + name + " called, ran method stub.");
+                return 0;
+            };
+        }
+    }
+    
     // Memory is just a big array of bytes, right?
     // "Allocation" is appending onto this array
     // A pointer to memory is an index into this array.
@@ -108,7 +125,7 @@ ProgramState.prototype.step = function() {
     case op.RETURN:
         var retVal = this.pop();
         if (this.call_stack.length == 0)
-            throw retVal;
+            return retVal;
 
         this.frame = this.call_stack.pop();
         this.push(retVal);
@@ -183,7 +200,6 @@ ProgramState.prototype.step = function() {
         this.frame.pc++;
         var y = this.pop();
         var x = this.pop();
-        console.log("y="+y+", x="+x);
         if (y < 0 || y > 31) c0_arith_error("Shifting by too many bits");
         this.push(x>>y);
         break;
@@ -276,6 +292,30 @@ ProgramState.prototype.step = function() {
         this.frame = newFrame;
         break;
 
+    case op.INVOKENATIVE:
+        var c1 = this.frame.program[this.frame.pc+1];
+        var c2 = this.frame.program[this.frame.pc+2];
+        this.frame.pc += 3;
+
+        var index = (c1 << 8) + c2;
+
+        var f = this.file.native_pool[index];
+        var arg_array = [];
+        for (var i = f.num_args - 1; i >= 0; i--)
+            arg_array[i] = this.pop();
+
+        var native_function = this.natives[f.function_table_index];
+        if (native_function === undefined) {
+            native_function = function (ignored) {
+                console.log("Could not find native function with index " +
+                            f.function_table_index);
+                return 0;
+            };
+            console.log("Unknown native function index " + f.function_table_index);
+        }
+        this.push(native_function(arg_array));
+        break;
+
         // Memory allocation operations:
 
     case op.NEW:
@@ -354,7 +394,6 @@ ProgramState.prototype.step = function() {
                     " (" + opcode_name + ")\n");
         throw "Error - unknown opcode";
     }
-    return false;
 }
 
 // Takes in a parsed .bc0 file and runs it
@@ -362,18 +401,13 @@ function execute(file, callbacks, v) {
     verbose = typeof v !== 'undefined' ? v : true;
     log("Initializing with file " + file);
 
-    var state = new ProgramState(file);
+    var state = new ProgramState(file, callbacks);
 
     log("Beginning execution");
     
     while (true) {
-        // I'm not sure how to structure this control flow yet,
-        // so if anyone has a better idea, let me know
-        try {
-            state.step();
-        } catch (val) {
-            return val;
-        }
+        var val = state.step();
+        if (val !== undefined) return val;
 
         // if (at_breakpoint) {
         //   save state (maybe in a global in this file?)
