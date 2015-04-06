@@ -37,3 +37,14 @@ exports.testIF = doTest("testif.c0.bc0", 32);
 
 exports.testDSQUARED = doTest("dsquared.c0.bc0", 17068);
     
+exports.testArrays = function(test) {
+    var result = c0vm.execute(parser.parse("arrays.c0.bc0"), callbacks, false);
+    test.ok(false, "test.bc0 - Did not print to screen correctly");
+    test.done();
+}
+
+exports.testStructs = function(test) {
+    var result = c0vm.execute(parser.parse("structs.c0.bc0"), callbacks, false);
+    test.ok(false, "test.bc0 - Did not print to screen correctly");
+    test.done();
+}
