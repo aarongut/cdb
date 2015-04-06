@@ -14,10 +14,12 @@ callbacks = {};
 callbacks[c0ffi.NATIVE_PRINT] = function(args) {
     console.log("Print function says: " + args[0]);
 }
-callbacks["printint"] = function(args) {
+callbacks[c0ffi.NATIVE_PRINTINT] = function(args) {
     console.log("Printint function says: " + args[0]);
 }
 
-var file = parser.parse("../test/sample2.5.c0.bc0");
+console.log(callbacks);
+
+var file = parser.parse("../test/structs.c0.bc0");
 console.log("Result is " + c0vm.execute(file, callbacks));
 

@@ -49,6 +49,6 @@ B0       # return          #
 
 00 02             # native count
 # native pool
-00 01 00 06       # print
-00 01 00 09       # printint
+00 01 00 10       # print
+00 01 00 13       # printint
 

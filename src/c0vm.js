@@ -16,6 +16,21 @@ function c0_memory_error(val) {
     throw ("c0 memory error: " + val);
 }
 
+function i32_to_array(i32) {
+    return [(i32 & 0xFF),
+            ((i32 >> 8) & 0xFF),
+            ((i32 >> 16) & 0xFF),
+            ((i32 >> 24) & 0xFF)];
+            
+}
+
+function array_to_i32(array) {
+    return array[0] +
+        (array[1] << 8) +
+        (array[2] << 16) +
+        (array[3] << 24);
+}
+
 var StackFrame = function(file, f) {
     log("Creating stack frame");
     this.stack = [];
@@ -375,13 +390,49 @@ ProgramState.prototype.step = function() {
     case op.IMLOAD:
         var addr = this.pop();
         // Get int32 from bytes
-        var val = this.heapdsfjsldkfjsd
-        this.push(this.heap[addr]);
+        var c1 = this.heap[addr];
+        var c2 = this.heap[addr+1];
+        var c3 = this.heap[addr+2];
+        var c4 = this.heap[addr+3];
+        var combined = array_to_i32([c1, c2, c3, c4]);
+        this.push(combined);
         this.frame.pc++;
         break;
 
     case op.IMSTORE:
-        
+        var value = this.pop();
+        var addr = this.pop();
+        var array = i32_to_array(value);
+
+        for (var i = 0; i < 4; i++)
+            this.heap[addr + i] = array[i];
+        this.frame.pc++;
+
+    case op.AMLOAD:
+        var addr = this.pop();
+        this.push(this.heap[addr]);
+        this.frame.pc++;
+        break;
+
+    case op.AMSTORE:
+        var value = this.pop();
+        var addr = this.pop();
+        this.heap[addr] = value;
+        this.frame.pc++;
+        break;
+
+    case op.CMLOAD:
+        var addr = this.pop();
+        this.push(this.heap[addr]);
+        this.frame.pc++;
+        break;
+
+    case op.CMSTORE:
+        var value = this.pop();
+        var addr = this.pop();
+        this.heap[addr] = value;
+        this.frame.pc++;
+        break;
 
     default:
         var opcode_name;

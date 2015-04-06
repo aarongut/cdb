@@ -65,7 +65,7 @@ exports.testArrays = function(test) {
 exports.testStructs = function(test) {
     printout = "";
     var result = c0vm.execute(parser.parse("structs.c0.bc0"), callbacks, false);
-    test.ok(printout == "expected result here",
+    test.ok(printout == "potato chip123",
             "structs.c0.bc0 - Did not print to screen correctly, result was " + 
             printout);
     test.done();
