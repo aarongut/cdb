@@ -30,6 +30,15 @@ var ProgramState = function(parsed_file) {
     this.frame = new StackFrame(parsed_file, parsed_file.function_pool[0]);
     this.call_stack = [];
     this.file = parsed_file;
+
+    // Memory is just a big array of bytes, right?
+    // "Allocation" is appending onto this array
+    // A pointer to memory is an index into this array.
+
+    // Structs are stored as themselves
+    // Arrays are stored as an entry for the number of elements
+    // and then the array, byte-by-byte
+    this.heap = [];
 }
 
 ProgramState.prototype.push = function(val) {
@@ -266,6 +275,73 @@ ProgramState.prototype.step = function() {
         this.call_stack.push(this.frame);
         this.frame = newFrame;
         break;
+
+        // Memory allocation operations:
+
+    case op.NEW:
+        var size = this.frame.program[this.frame.pc+1];
+        var address = this.heap.length;
+
+        for (var i = 0; i < size; i++) this.heap.push(0);
+        
+        this.push(address);
+        this.frame.pc += 2;
+        break;
+
+    case op.NEWARRAY:
+        var size = this.frame.program[this.frame.pc+1];
+        var address = this.heap.length;
+        var num_elements = this.pop();
+        if (num_elements < 0) c0_memory_error("Array size must be nonnegative");
+
+        this.heap.push(num_elements);
+        this.heap.push(size);
+        
+        for (var i = 0; i < num_elements; i++) {
+            for (var j = 0; j < size; j++)
+                this.heap.push(0);
+        }
+
+        this.push(address);
+        this.frame.pc += 2;
+        break;
+
+    case op.ARRAYLENGTH:
+        var pointer = this.pop();
+        this.push(this.heap[pointer]);
+        break;
+
+        // Memory access operations:
+
+    case op.AADDF:
+        // Read offset into a struct
+        var offset = this.frame.program[this.frame.pc + 1];
+        var index = this.pop();
+        this.push(this.heap[index + offset]);
+        this.frame.pc += 2;
+        break;
+
+    case op.AADDS:
+        // Read offset into an array
+        var elt_index = this.pop();
+        var index = this.pop();
+        var array_length = this.heap[index];
+        var elt_size = this.heap[index+1];
+        if (elt_index >= array_length) c0_memory_error("Array index out of bounds.");
+        this.push(this.heap[index + 2 + elt_size*elt_index]);
+        this.frame.pc++;
+        break;
+
+    case op.IMLOAD:
+        var addr = this.pop();
+        // Get int32 from bytes
+        var val = this.heapdsfjsldkfjsd
+        this.push(this.heap[addr]);
+        this.frame.pc++;
+        break;
+
+    case op.IMSTORE:
+        
 
     default:
         var opcode_name;
