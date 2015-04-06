@@ -78,6 +78,8 @@ ProgramState.prototype.push = function(val) {
 }
 
 ProgramState.prototype.pop = function() {
+    if (this.frame.stack === [])
+        throw "Tried to pop from an empty stack!";
     return this.frame.stack.pop();
 }
 
@@ -372,7 +374,7 @@ ProgramState.prototype.step = function() {
         // Read offset into a struct
         var offset = this.frame.program[this.frame.pc + 1];
         var index = this.pop();
-        this.push(this.heap[index + offset]);
+        this.push(index + offset);
         this.frame.pc += 2;
         break;
 
@@ -407,6 +409,7 @@ ProgramState.prototype.step = function() {
         for (var i = 0; i < 4; i++)
             this.heap[addr + i] = array[i];
         this.frame.pc++;
+        break;
 
     case op.AMLOAD:
         var addr = this.pop();
@@ -459,6 +462,16 @@ function execute(file, callbacks, v) {
     while (true) {
         var val = state.step();
         if (val !== undefined) return val;
+
+        if (verbose) {
+            console.log("Machine state:");
+            console.log("  Current Stack Frame:");
+            console.log("    Stack: " + state.frame.stack);
+            console.log("    PC:    " + state.frame.pc);
+            console.log("    Vars:  " + state.frame.variables);
+            console.log("    Code:  " + state.frame.program);
+            console.log("  Heap: " + state.heap);
+        }
 
         // if (at_breakpoint) {
         //   save state (maybe in a global in this file?)

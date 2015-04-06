@@ -13,9 +13,11 @@ c0ffi = require("./c0ffi.js");
 callbacks = {};
 callbacks[c0ffi.NATIVE_PRINT] = function(args) {
     console.log("Print function says: " + args[0]);
+    return 0;
 }
 callbacks[c0ffi.NATIVE_PRINTINT] = function(args) {
     console.log("Printint function says: " + args[0]);
+    return 0;
 }
 
 console.log(callbacks);
