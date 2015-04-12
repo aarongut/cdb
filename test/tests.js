@@ -7,14 +7,17 @@ var printout = "";
 
 callbacks[c0ffi.NATIVE_PRINT] = function(args) {
     printout += args[0];
+    return 0;
 }
 
 callbacks[c0ffi.NATIVE_PRINTINT] = function(args) {
     printout += args[0];
+    return 0;
 }
 
 callbacks[c0ffi.NATIVE_PRINTLN] = function(args) {
     printout += (args[0] + "\n");
+    return 0;
 }
 
 function doTest(filename, expected_result) {
@@ -57,8 +60,17 @@ exports.testDSQUARED = doTest("dsquared.c0.bc0", 17068);
     
 exports.testArrays = function(test) {
     test.throws(function () {
-        c0vm.execute(parser.parse("arrays.c0.bc0"), callbacks, true)
+        c0vm.execute(parser.parse("arrays.c0.bc0"), callbacks, false)
     });
+    test.done();
+}
+
+exports.testMoreArray = function(test) {
+    printout = "";
+    var result = c0vm.execute(parser.parse("moreArrays.c0.bc0"), callbacks, false);
+    test.ok(printout == "2312",
+            "moreArrays.c0.bc0 - Did not print to screen correctly, result was " + 
+            printout);
     test.done();
 }
 
@@ -71,3 +83,18 @@ exports.testStructs = function(test) {
     test.done();
 }
 
+exports.testAbort = function(test) {
+    test.throws(function () {
+        c0vm.execute(parser.parse("abort.c0.bc0"), callbacks, false);
+    });
+    test.done();
+}
+
+exports.testArith = function(test) {
+    printout = "";
+    var result = c0vm.execute(parser.parse("arith.c0.bc0"), callbacks, false);
+    test.ok(printout == "-2147483648   2147483647   -375   -2147483648   -9   -1   12   \n-12   12   Modulus testing   11-1   5   1   Testing constants   -251   Testing inequalities   \ny1  y2  y3  n4  n5  n6  y7  Testing bitwise operators   \n992000   1045310   53250   -12083   Testing bit shifting\n-2147483648   736   0   588088   -31   -19   \n0\n",
+            "arith.c0.bc0 - Did not print to screen correctly, result was " + 
+            printout);
+    test.done();
+}

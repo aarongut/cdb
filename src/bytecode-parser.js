@@ -72,10 +72,11 @@ var Bc0File = function (filename) {
     for (var i = 0; i < this.string_count; i++) {
         var c = stream.get_u1();
         if (c == 0) {
-            this.string_pool.push(current_string);
-            current_string = "";
+            // this.string_pool.push(current_string);
+            // current_string = "";
+            this.string_pool.push(0);
         } else {
-            current_string += String.fromCharCode(c);
+            this.string_pool.push(String.fromCharCode(c));
         }
     }
 
@@ -91,6 +92,15 @@ var Bc0File = function (filename) {
     for (var i = 0; i < this.native_count; i++) {
         this.native_pool.push(new NativeInfo(stream));
     }
+}
+
+Bc0File.prototype.string_from_index = function (i) {
+    var result = "";
+    while (this.string_pool[i] !== 0 && i < this.string_pool.length) {
+        result += this.string_pool[i];
+        i++;
+    }
+    return result;
 }
 
 function parse(filename) {
