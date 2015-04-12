@@ -20,6 +20,30 @@ callbacks[c0ffi.NATIVE_PRINTLN] = function(args) {
     return 0;
 }
 
+callbacks[c0ffi.NATIVE_STRING_LENGTH] = function(args) {
+    return args[0].length;
+}
+
+callbacks[c0ffi.NATIVE_STRING_TO_CHARARRAY] = function(args) {
+    return args[0];
+}
+
+callbacks[c0ffi.NATIVE_STRING_FROM_CHARARRAY] = function(args) {
+    console.log("string_from_chararray: " + args);
+    return args[0];
+}
+
+callbacks[c0ffi.NATIVE_CHAR_CHR] = function(args) {
+    return String.fromCharCode(args[0]);
+}
+
+callbacks[c0ffi.NATIVE_CHAR_ORD] = function(args) {
+    console.log("native_car_ord: " + args);
+    if (typeof args[0] == "string")
+        return args[0].charCodeAt(0);
+    return args[0];
+}
+
 function doTest(filename, expected_result) {
     return function(test) {
         var result = c0vm.execute(parser.parse(filename), callbacks, false);
@@ -95,6 +119,17 @@ exports.testArith = function(test) {
     var result = c0vm.execute(parser.parse("arith.c0.bc0"), callbacks, false);
     test.ok(printout == "-2147483648   2147483647   -375   -2147483648   -9   -1   12   \n-12   12   Modulus testing   11-1   5   1   Testing constants   -251   Testing inequalities   \ny1  y2  y3  n4  n5  n6  y7  Testing bitwise operators   \n992000   1045310   53250   -12083   Testing bit shifting\n-2147483648   7360588088-31-19\n",
             "arith.c0.bc0 - Did not print to screen correctly, result was " + 
+            printout);
+    test.done();
+}
+
+exports.testPIAZZA1 = doTest("piazza1.c0.bc0", 18);
+
+exports.testSTRINGS = function(test) {
+    printout = "";
+    var result = c0vm.execute(parser.parse("strings.c0.bc0"), callbacks, false);
+    test.ok(printout == "hello there!?",
+            "strings.c0.bc0 - Did not print to screen correctly, result was " + 
             printout);
     test.done();
 }

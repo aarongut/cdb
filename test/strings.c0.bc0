@@ -109,10 +109,10 @@ B0       # return          #
 
 00 06             # native count
 # native pool
-00 01 00 47       # char_ord
-00 01 00 46       # char_chr
-00 01 00 50       # string_length
-00 01 00 53       # string_to_chararray
-00 01 00 4B       # string_from_chararray
-00 01 00 06       # print
+00 01 00 51       # char_ord
+00 01 00 50       # char_chr
+00 01 00 5A       # string_length
+00 01 00 5D       # string_to_chararray
+00 01 00 55       # string_from_chararray
+00 01 00 10       # print
 

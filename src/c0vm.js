@@ -394,10 +394,16 @@ ProgramState.prototype.step = function() {
         // Read offset into an array
         var elt_index = this.pop();
         var index = this.pop();
-        var array_length = this.heap[index];
-        var elt_size = this.heap[index+1];
-        if (elt_index >= array_length) c0_memory_error("Array index out of bounds.");
-        this.push(index + 2 + (elt_size*elt_index));
+
+        if (typeof index == "string") {
+            this.push(index.slice(elt_index));
+        } else {
+            var array_length = this.heap[index];
+            var elt_size = this.heap[index+1];
+            if (elt_index >= array_length)
+                c0_memory_error("Array index out of bounds.");
+            this.push(index + 2 + (elt_size*elt_index));
+        }
         this.frame.pc++;
         break;
 
@@ -438,7 +444,10 @@ ProgramState.prototype.step = function() {
 
     case op.CMLOAD:
         var addr = this.pop();
-        this.push(this.heap[addr]);
+        if (typeof addr == "string")
+            this.push(addr);
+        else
+            this.push(this.heap[addr]);
         this.frame.pc++;
         break;
 
