@@ -93,7 +93,7 @@ exports.testAbort = function(test) {
 exports.testArith = function(test) {
     printout = "";
     var result = c0vm.execute(parser.parse("arith.c0.bc0"), callbacks, false);
-    test.ok(printout == "-2147483648   2147483647   -375   -2147483648   -9   -1   12   \n-12   12   Modulus testing   11-1   5   1   Testing constants   -251   Testing inequalities   \ny1  y2  y3  n4  n5  n6  y7  Testing bitwise operators   \n992000   1045310   53250   -12083   Testing bit shifting\n-2147483648   736   0   588088   -31   -19   \n0\n",
+    test.ok(printout == "-2147483648   2147483647   -375   -2147483648   -9   -1   12   \n-12   12   Modulus testing   11-1   5   1   Testing constants   -251   Testing inequalities   \ny1  y2  y3  n4  n5  n6  y7  Testing bitwise operators   \n992000   1045310   53250   -12083   Testing bit shifting\n-2147483648   7360588088-31-19\n",
             "arith.c0.bc0 - Did not print to screen correctly, result was " + 
             printout);
     test.done();
