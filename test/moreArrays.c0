@@ -1,0 +1,10 @@
+#use <conio>
+
+int main() {
+    int[] A = alloc_array(int, 50);
+    A[3] = 23;
+    A[2] = 12;
+    printint(A[3]);
+    printint(A[2]);
+    return 0;
+}

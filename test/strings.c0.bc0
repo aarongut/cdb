@@ -1,0 +1,118 @@
+C0 C0 FF EE       # magic number
+00 09             # version 4, arch = 1 (64 bits)
+
+00 00             # int pool count
+# int pool
+
+00 0E             # string pool total size
+# string pool
+48 45 6C 6C 6F 20 54 68 65 72 65 21 3F 00  # "HEllo There!\?"
+
+00 03             # function count
+# function_pool
+
+#<main>
+00 00             # number of arguments = 0
+00 05             # number of local variables = 5
+00 0D             # code length = 13 bytes
+14 00 00 # aldc 0          # s[0] = "HEllo There!\?"
+B8 00 02 # invokestatic 2  # string_lower("HEllo There!\?")
+B7 00 05 # invokenative 5  # print(string_lower("HEllo There!\?"))
+57       # pop             # (ignore result)
+10 00    # bipush 0        # 0
+B0       # return          # 
+
+
+#<char_tolower>
+00 01             # number of arguments = 1
+00 03             # number of local variables = 3
+00 3D             # code length = 61 bytes
+15 00    # vload 0         # c
+B7 00 00 # invokenative 0  # char_ord(c)
+36 01    # vstore 1        # ccode = char_ord(c);
+10 41    # bipush 65       # 'A'
+B7 00 00 # invokenative 0  # char_ord('A')
+15 01    # vload 1         # ccode
+A4 00 06 # if_icmple +6    # if (char_ord('A') <= ccode) goto <03:and>
+A7 00 29 # goto +41        # goto <01:else>
+# <03:and>
+15 01    # vload 1         # ccode
+10 5A    # bipush 90       # 'Z'
+B7 00 00 # invokenative 0  # char_ord('Z')
+A4 00 06 # if_icmple +6    # if (ccode <= char_ord('Z')) goto <00:then>
+A7 00 1C # goto +28        # goto <01:else>
+# <00:then>
+10 61    # bipush 97       # 'a'
+B7 00 00 # invokenative 0  # char_ord('a')
+10 41    # bipush 65       # 'A'
+B7 00 00 # invokenative 0  # char_ord('A')
+64       # isub            # (char_ord('a') - char_ord('A'))
+36 02    # vstore 2        # shift = (char_ord('a') - char_ord('A'));
+15 01    # vload 1         # ccode
+15 02    # vload 2         # shift
+60       # iadd            # (ccode + shift)
+B7 00 01 # invokenative 1  # char_chr((ccode + shift))
+B0       # return          # 
+A7 00 06 # goto +6         # goto <02:endif>
+# <01:else>
+15 00    # vload 0         # c
+B0       # return          # 
+# <02:endif>
+
+
+#<string_lower>
+00 01             # number of arguments = 1
+00 05             # number of local variables = 5
+00 4C             # code length = 76 bytes
+15 00    # vload 0         # s
+B7 00 02 # invokenative 2  # string_length(s)
+36 01    # vstore 1        # len = string_length(s);
+15 00    # vload 0         # s
+B7 00 03 # invokenative 3  # string_to_chararray(s)
+36 02    # vstore 2        # A = string_to_chararray(s);
+15 01    # vload 1         # len
+10 01    # bipush 1        # 1
+60       # iadd            # (len + 1)
+BC 01    # newarray 1      # alloc_array(char, (len + 1))
+36 03    # vstore 3        # B = alloc_array(char, (len + 1));
+10 00    # bipush 0        # 0
+36 04    # vstore 4        # i = 0;
+# <04:loop>
+15 04    # vload 4         # i
+15 01    # vload 1         # len
+A1 00 06 # if_icmplt +6    # if (i < len) goto <05:body>
+A7 00 1C # goto +28        # goto <06:exit>
+# <05:body>
+15 03    # vload 3         # B
+15 04    # vload 4         # i
+63       # aadds           # &B[i]
+15 02    # vload 2         # A
+15 04    # vload 4         # i
+63       # aadds           # &A[i]
+34       # cmload          # A[i]
+B8 00 01 # invokestatic 1  # char_tolower(A[i])
+55       # cmstore         # B[i] = char_tolower(A[i]);
+15 04    # vload 4         # i
+10 01    # bipush 1        # 1
+60       # iadd            # 
+36 04    # vstore 4        # i += 1;
+A7 FF E0 # goto -32        # goto <04:loop>
+# <06:exit>
+15 03    # vload 3         # B
+15 01    # vload 1         # len
+63       # aadds           # &B[len]
+10 00    # bipush 0        # '\000'
+55       # cmstore         # B[len] = '\0';
+15 03    # vload 3         # B
+B7 00 04 # invokenative 4  # string_from_chararray(B)
+B0       # return          # 
+
+00 06             # native count
+# native pool
+00 01 00 47       # char_ord
+00 01 00 46       # char_chr
+00 01 00 50       # string_length
+00 01 00 53       # string_to_chararray
+00 01 00 4B       # string_from_chararray
+00 01 00 06       # print
+
