@@ -1,6 +1,5 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var ByteStream = function (byte_array) {
-    console.log("Instance created.");
     this.byte_array = byte_array;
     this.index = 0;
 };
@@ -147,238 +146,580 @@ function parse(filename) {
 exports.getBytes = getBytes;
 exports.parse = parse;
 
-},{"./byte-stream":1,"fs":6}],3:[function(require,module,exports){
+},{"./byte-stream":1,"fs":7}],3:[function(require,module,exports){
+exports.NATIVE_FADD = 0
+exports.NATIVE_FDIV = 1
+exports.NATIVE_FLESS = 2
+exports.NATIVE_FMUL = 3
+exports.NATIVE_FSUB = 4
+exports.NATIVE_FTOI = 5
+exports.NATIVE_ITOF = 6
+exports.NATIVE_PRINT_FPT = 7
+exports.NATIVE_PRINT_HEX = 8
+exports.NATIVE_PRINT_INT = 9
+
+/* args */
+exports.NATIVE_ARGS_FLAG = 10
+exports.NATIVE_ARGS_INT = 11
+exports.NATIVE_ARGS_PARSE = 12
+exports.NATIVE_ARGS_STRING = 13
+
+/* conio */
+exports.NATIVE_EOF = 14
+exports.NATIVE_FLUSH = 15
+exports.NATIVE_PRINT = 16
+exports.NATIVE_PRINTBOOL = 17
+exports.NATIVE_PRINTCHAR = 18
+exports.NATIVE_PRINTINT = 19
+exports.NATIVE_PRINTLN = 20
+exports.NATIVE_READLINE = 21
+
+/* curses */
+exports.NATIVE_C_ADDCH = 22
+exports.NATIVE_C_CBREAK = 23
+exports.NATIVE_C_CURS_SET = 24
+exports.NATIVE_C_DELCH = 25
+exports.NATIVE_C_ENDWIN = 26
+exports.NATIVE_C_ERASE = 27
+exports.NATIVE_C_GETCH = 28
+exports.NATIVE_C_INITSCR = 29
+exports.NATIVE_C_KEYPAD = 30
+exports.NATIVE_C_MOVE = 31
+exports.NATIVE_C_NOECHO = 32
+exports.NATIVE_C_REFRESH = 33
+exports.NATIVE_C_SUBWIN = 34
+exports.NATIVE_C_WADDCH = 35
+exports.NATIVE_C_WADDSTR = 36
+exports.NATIVE_C_WCLEAR = 37
+exports.NATIVE_C_WERASE = 38
+exports.NATIVE_C_WMOVE = 39
+exports.NATIVE_C_WREFRESH = 40
+exports.NATIVE_C_WSTANDEND = 41
+exports.NATIVE_C_WSTANDOUT = 42
+exports.NATIVE_CC_GETBEGX = 43
+exports.NATIVE_CC_GETBEGY = 44
+exports.NATIVE_CC_GETMAXX = 45
+exports.NATIVE_CC_GETMAXY = 46
+exports.NATIVE_CC_GETX = 47
+exports.NATIVE_CC_GETY = 48
+exports.NATIVE_CC_HIGHLIGHT = 49
+exports.NATIVE_CC_KEY_IS_BACKSPACE = 50
+exports.NATIVE_CC_KEY_IS_DOWN = 51
+exports.NATIVE_CC_KEY_IS_ENTER = 52
+exports.NATIVE_CC_KEY_IS_LEFT = 53
+exports.NATIVE_CC_KEY_IS_RIGHT = 54
+exports.NATIVE_CC_KEY_IS_UP = 55
+exports.NATIVE_CC_WBOLDOFF = 56
+exports.NATIVE_CC_WBOLDON = 57
+exports.NATIVE_CC_WDIMOFF = 58
+exports.NATIVE_CC_WDIMON = 59
+exports.NATIVE_CC_WREVERSEOFF = 60
+exports.NATIVE_CC_WREVERSEON = 61
+exports.NATIVE_CC_WUNDEROFF = 62
+exports.NATIVE_CC_WUNDERON = 63
+
+/* file */
+exports.NATIVE_FILE_CLOSE = 64
+exports.NATIVE_FILE_CLOSED = 65
+exports.NATIVE_FILE_EOF = 66
+exports.NATIVE_FILE_READ = 67
+exports.NATIVE_FILE_READLINE = 68
+
+/* img */
+exports.NATIVE_IMAGE_CLONE = 69
+exports.NATIVE_IMAGE_CREATE = 70
+exports.NATIVE_IMAGE_DATA = 71
+exports.NATIVE_IMAGE_DESTROY = 72
+exports.NATIVE_IMAGE_HEIGHT = 73
+exports.NATIVE_IMAGE_LOAD = 74
+exports.NATIVE_IMAGE_SAVE = 75
+exports.NATIVE_IMAGE_SUBIMAGE = 76
+exports.NATIVE_IMAGE_WIDTH = 77
+
+/* parse */
+exports.NATIVE_PARSE_BOOL = 78
+exports.NATIVE_PARSE_INT = 79
+
+/* string */
+exports.NATIVE_CHAR_CHR = 80
+exports.NATIVE_CHAR_ORD = 81
+exports.NATIVE_STRING_CHARAT = 82
+exports.NATIVE_STRING_COMPARE = 83
+exports.NATIVE_STRING_EQUAL = 84
+exports.NATIVE_STRING_FROM_CHARARRAY = 85
+exports.NATIVE_STRING_FROMBOOL = 86
+exports.NATIVE_STRING_FROMCHAR = 87
+exports.NATIVE_STRING_FROMINT = 88
+exports.NATIVE_STRING_JOIN = 89
+exports.NATIVE_STRING_LENGTH = 90
+exports.NATIVE_STRING_SUB = 91
+exports.NATIVE_STRING_TERMINATED = 92
+exports.NATIVE_STRING_TO_CHARARRAY = 93
+exports.NATIVE_STRING_TOLOWER = 94
+
+
+},{}],4:[function(require,module,exports){
 op = require("./opcodes");
 
-var ProgramState = function(parsed_file) {
-    var main_function = parsed_file.function_pool[0];
-    
-    this.stack = []
-    this.pc = 0;
-    this.program = main_function.code;
-    this.variables = [];
-    for (var i = 0; i < main_function.num_vars; i++)
-        variables.push(0);
-    this.file = parsed_file;
+var INT_MIN = 0x80000000;
+var INT_MAX = 0x7FFFFFFF;
+
+var verbose = false;
+function log(message) {
+    if (verbose) console.log(message);
 }
 
+function c0_assertion_failure(val) {
+    throw ("c0 assertion failure: " + val);
+}
 
-ProgramState.prototype.doIf = function(shouldJump) {
-    if (shouldJump) {
-        var address_offset = (this.program[this.pc+1] * 0x1000) + 
-            this.program[this.pc+2];
-        this.pc += address_offset;
+function c0_memory_error(val) {
+    throw ("c0 memory error: " + val);
+}
+
+function i32_to_array(i32) {
+    return [(i32 & 0xFF),
+            ((i32 >> 8) & 0xFF),
+            ((i32 >> 16) & 0xFF),
+            ((i32 >> 24) & 0xFF)];
+            
+}
+
+function array_to_i32(array) {
+    return array[0] +
+        (array[1] << 8) +
+        (array[2] << 16) +
+        (array[3] << 24);
+}
+
+var StackFrame = function(file, f) {
+    log("Creating stack frame");
+    this.stack = [];
+    this.pc = 0;
+    this.program = f.code;
+    this.variables = [];
+    for (var i = 0; i < f.num_vars; i++)
+        this.variables.push(0);
+    this.file = file;
+}
+
+var ProgramState = function(parsed_file, callback_dict) {
+    log("Creating program state with file " + parsed_file);
+    var main_function = parsed_file.function_pool[0];
+
+    this.frame = new StackFrame(parsed_file, parsed_file.function_pool[0]);
+    this.call_stack = [];
+    this.file = parsed_file;
+
+    this.natives = {};
+
+    for (var i = 0; i < 95; i++) {
+        try {
+            this.natives[i] = callback_dict[i];
+        } catch (key_not_found) {
+            this.natives[i] = function (arg) { 
+                console.log("Native function " + name + " called, ran method stub.");
+                return 0;
+            };
+        }
+    }
+    
+    // Memory is just a big array of bytes, right?
+    // "Allocation" is appending onto this array
+    // A pointer to memory is an index into this array.
+
+    // Structs are stored as themselves
+    // Arrays are stored as an entry for the number of elements
+    // and then the array, byte-by-byte
+    this.heap = [];
+}
+
+ProgramState.prototype.push = function(val) {
+    this.frame.stack.push(val);
+}
+
+ProgramState.prototype.pop = function() {
+    return this.frame.stack.pop();
+}
+
+ProgramState.prototype.goto_offset = function() {
+    var c1 = this.frame.program[this.frame.pc+1];
+    var c2 = this.frame.program[this.frame.pc+2]
+
+    var address_offset = (c1 << 8) + c2;
+    // Handle negative values
+    if ((address_offset & 0x8000) != 0)
+        address_offset = -0x8000 + (address_offset & 0x7FFF);
+
+    this.frame.pc += address_offset;
+}
+
+ProgramState.prototype.doIf = function(f) {
+    var y = this.pop();
+    var x = this.pop();
+    if (f(x,y)) {
+        this.goto_offset();
     } else {
-        this.pc += 3;
+        this.frame.pc += 3;
     }
 }
 
 ProgramState.prototype.step = function() {
-    console.log("Running opcode " + op.lookup_table[this.program[this.pc]]);
-    switch (this.program[this.pc]) {
+    var opcode = this.frame.program[this.frame.pc]
+    log("0x" + this.frame.pc.toString(16) + " Running opcode " +
+        op.lookup_table[opcode]);
+    switch (opcode) {
         // Stack manipulation
     case op.POP:
-        this.pc++;
-        this.stack.pop();
+        this.frame.pc++;
+        this.pop();
         break;
     case op.DUP:
-        this.pc++;
-        var v = this.stack.pop();
-        this.stack.push(v);
-        this.stack.push(v);
+        this.frame.pc++;
+        var v = this.pop();
+        this.push(v);
+        this.push(v);
         break;
     case op.SWAP:
-        this.pc++;
-        var v1 = this.stack.pop();
-        var v2 = this.stack.pop();
-        this.stack.push(v1);
-        this.stack.push(v2);
+        this.frame.pc++;
+        var v1 = this.pop();
+        var v2 = this.pop();
+        this.push(v1);
+        this.push(v2);
         break;
     case op.BIPUSH:
-        this.pc += 2;
-        var val = this.program[this.pc-1];
-
+        this.frame.pc += 2;
+        var val = this.frame.program[this.frame.pc-1];
+        
         // Do sign extension if necessary
-        if (val & 0x80 != 0)
+        if ((val & 0x80) != 0)
             val = -0x80 + (val & 0x7F);
-        this.stack.push(val);
+        this.push(val);
         break;
 
         // Returning from a function
     case op.RETURN:
-        var retVal = this.stack.pop();
-        throw retVal;
+        var retVal = this.pop();
+        if (this.call_stack.length == 0)
+            return retVal;
 
+        this.frame = this.call_stack.pop();
+        this.push(retVal);
+
+        break;
         // Arithmetic
     case op.IADD:
-        this.pc++;
-        var y = this.stack.pop();
-        var x = this.stack.pop();
-        console.log("Adding " + x + " and " + y);
-        this.stack.push((x+y) % 0x100000000);
+        this.frame.pc++;
+        var y = this.pop();
+        var x = this.pop();
+        log("Adding " + x + " and " + y);
+        this.push((x+y) % 0x100000000);
         break;
     case op.ISUB:
-        this.pc++;
-        var y = this.stack.pop();
-        var x = this.stack.pop();
-        this.stack.push((x-y) % 0x100000000);
+        this.frame.pc++;
+        var y = this.pop();
+        var x = this.pop();
+        this.push((x-y) % 0x100000000);
         break;
     case op.IMUL:
-        this.pc++;
-        var y = this.stack.pop();
-        var x = this.stack.pop();
-        this.stack.push((x*y) % 0x100000000);
+        this.frame.pc++;
+        var y = this.pop();
+        var x = this.pop();
+        this.push((x*y) % 0x100000000);
         break;
     case op.IDIV:
-        this.pc++;
-        var y = this.stack.pop();
-        var x = this.stack.pop();
+        this.frame.pc++;
+        var y = this.pop();
+        var x = this.pop();
         if (y == 0) c0_arith_error("Divide by zero");
         if (x == INT_MIN && y == -1) c0_arith_error("Arithmetic overflow");
 
         // This does int division.
         // As I understand it, the ~~ is treated as the identity on integers
         // which forces the type to int, not float
-        this.stack.push(~~(x/y));
+        this.push(~~(x/y));
         break;
     case op.IREM:
-        this.pc++;
-        var y = this.stack.pop();
-        var x = this.stack.pop();
+        this.frame.pc++;
+        var y = this.pop();
+        var x = this.pop();
         if (y == 0) c0_arith_error("Divide by zero");
         if (x == INT_MIN && y == -1) c0_arith_error("Arithmetic overflow");
-        this.stack.push(x%y);
+        this.push(x%y);
         break;
     case op.IAND:
-        this.pc++;
-        var y = this.stack.pop();
-        var x = this.stack.pop();
-        this.stack.push(x&y);
+        this.frame.pc++;
+        var y = this.pop();
+        var x = this.pop();
+        this.push(x&y);
         break;
     case op.IOR:
-        this.pc++;
-        var y = this.stack.pop();
-        var x = this.stack.pop();
-        this.stack.push(x|y);
+        this.frame.pc++;
+        var y = this.pop();
+        var x = this.pop();
+        this.push(x|y);
         break;
     case op.IXOR:
-        this.pc++;
-        var y = this.stack.pop();
-        var x = this.stack.pop();
-        this.stack.push(x^y);
+        this.frame.pc++;
+        var y = this.pop();
+        var x = this.pop();
+        this.push(x^y);
         break;
     case op.ISHL:
-        this.pc++;
-        var y = this.stack.pop();
-        var x = this.stack.pop();
+        this.frame.pc++;
+        var y = this.pop();
+        var x = this.pop();
         if (y < 0 || y > 31) c0_arith_error("Shifting by too many bits");
-        this.stack.push(x<<y);
+        this.push(x<<y);
         break;
     case op.ISHR:
-        this.pc++;
-        var y = this.stack.pop();
-        var x = this.stack.pop();
+        this.frame.pc++;
+        var y = this.pop();
+        var x = this.pop();
         if (y < 0 || y > 31) c0_arith_error("Shifting by too many bits");
-        this.stack.push(x>>y);
+        this.push(x>>y);
         break;
 
         // Operations on local variables
 
     case op.VLOAD:
-        this.pc += 2;
-        var index = this.program[this.pc-1];
-        this.stack.push(this.variables[index]);
+        this.frame.pc += 2;
+        var index = this.frame.program[this.frame.pc-1];
+        this.push(this.frame.variables[index]);
         break;
     case op.VSTORE:
-        this.pc += 2;
-        var index = this.program[this.pc-1];
-        this.variables[index] = this.stack.pop();
+        this.frame.pc += 2;
+        var index = this.frame.program[this.frame.pc-1];
+        this.frame.variables[index] = this.pop();
         break;
     case op.ACONST_NULL:
-        this.pc++;
-        this.stack.push(0);
+        this.frame.pc++;
+        this.push(0);
         break;
     case op.ILDC:
-        this.pc += 3;
-        var c1 = this.program[this.pc-2];
-        var c2 = this.program[this.pc-1];
+        this.frame.pc += 3;
+        var c1 = this.frame.program[this.frame.pc-2];
+        var c2 = this.frame.program[this.frame.pc-1];
         var index = (c1 * 0x1000) + c2;
 
-        this.stack.push(this.file.int_pool[index]);
+        this.push(this.file.int_pool[index]);
         break;
     case op.ALDC:
-        console.log("Error: I don't know how to handle ALDC yet");
-        throw "Error - can't handle ALDC";
+        this.frame.pc += 3;
+        var c1 = this.frame.program[this.frame.pc-2];
+        var c2 = this.frame.program[this.frame.pc-1];
+        var index = (c1 * 0x1000) + c2;
+
+        this.push(this.file.string_pool[index]);
+        break;
 
         // Control flow
     case op.NOP:
-        this.pc++;
+        this.frame.pc++;
         break;
     case op.IF_CMPEQ:
-        var y = this.stack.pop();
-        var x = this.stack.pop();
-        this.doIf(y == x);
+        this.doIf(function (x,y) {return y == x;});
         break;
     case op.IF_CMPNE:
-        var y = this.stack.pop();
-        var x = this.stack.pop();
-        this.doIf(y != x);
+        this.doIf(function (x,y) {return y != x;});
         break;
-    case op.IF_CMPLT:
-        var y = this.stack.pop();
-        var x = this.stack.pop();
-        this.doIf(y > x);
+    case op.IF_ICMPLT:
+        this.doIf(function (x,y) {return y > x;});
         break;
-    case op.IF_CMPGE:
-        var y = this.stack.pop();
-        var x = this.stack.pop();
-        this.doIf(y <= x);
+    case op.IF_ICMPGE:
+        this.doIf(function (x,y) {return y <= x;});
         break;
-    case op.IF_CMPGT:
-        var y = this.stack.pop();
-        var x = this.stack.pop();
-        this.doIf(y < x);
+    case op.IF_ICMPGT:
+        this.doIf(function (x,y) {return y < x;});
         break;
-    case op.IF_CMPLE:
-        var y = this.stack.pop();
-        var x = this.stack.pop();
-        this.doIf(y >= x);
+    case op.IF_ICMPLE:
+        this.doIf(function (x,y) {return y >= x;});
         break;
     case op.GOTO:
-        this.doIf(true);
+        this.goto_offset();
         break;
     case op.ATHROW:
-        this.pc++;
-        c0_user_error(this.stack.pop());
+        this.frame.pc++;
+        c0_user_error(this.pop());
         break;
     case op.ASSERT:
-        this.pc++;
-        var a = this.stack.pop();
-        if (this.stack.pop() == 0)
+        this.frame.pc++;
+        var a = this.pop();
+        if (this.pop() == 0)
             c0_assertion_failure(a);
         break;
 
+        // Function call operations
+
+    case op.INVOKESTATIC:
+        var c1 = this.frame.program[this.frame.pc+1];
+        var c2 = this.frame.program[this.frame.pc+2];
+        this.frame.pc += 3;
+
+        var index = (c1 << 8) + c2;
+
+        var f = this.file.function_pool[index];
+        var newFrame = new StackFrame(this.file, f);
+        for (var i = f.num_args - 1; i >= 0; i--) {
+            newFrame.variables[i] = this.pop();
+        }
+
+        this.call_stack.push(this.frame);
+        this.frame = newFrame;
+        break;
+
+    case op.INVOKENATIVE:
+        var c1 = this.frame.program[this.frame.pc+1];
+        var c2 = this.frame.program[this.frame.pc+2];
+        this.frame.pc += 3;
+
+        var index = (c1 << 8) + c2;
+
+        var f = this.file.native_pool[index];
+        var arg_array = [];
+        for (var i = f.num_args - 1; i >= 0; i--)
+            arg_array[i] = this.pop();
+
+        var native_function = this.natives[f.function_table_index];
+        if (native_function === undefined) {
+            native_function = function (ignored) {
+                console.log("Could not find native function with index " +
+                            f.function_table_index);
+                return 0;
+            };
+            console.log("Unknown native function index " + f.function_table_index);
+        }
+        this.push(native_function(arg_array));
+        break;
+
+        // Memory allocation operations:
+
+    case op.NEW:
+        var size = this.frame.program[this.frame.pc+1];
+        var address = this.heap.length;
+
+        for (var i = 0; i < size; i++) this.heap.push(0);
+        
+        this.push(address);
+        this.frame.pc += 2;
+        break;
+
+    case op.NEWARRAY:
+        var size = this.frame.program[this.frame.pc+1];
+        var address = this.heap.length;
+        var num_elements = this.pop();
+        if (num_elements < 0) c0_memory_error("Array size must be nonnegative");
+
+        this.heap.push(num_elements);
+        this.heap.push(size);
+        
+        for (var i = 0; i < num_elements; i++) {
+            for (var j = 0; j < size; j++)
+                this.heap.push(0);
+        }
+
+        this.push(address);
+        this.frame.pc += 2;
+        break;
+
+    case op.ARRAYLENGTH:
+        var pointer = this.pop();
+        this.push(this.heap[pointer]);
+        break;
+
+        // Memory access operations:
+
+    case op.AADDF:
+        // Read offset into a struct
+        var offset = this.frame.program[this.frame.pc + 1];
+        var index = this.pop();
+        this.push(this.heap[index + offset]);
+        this.frame.pc += 2;
+        break;
+
+    case op.AADDS:
+        // Read offset into an array
+        var elt_index = this.pop();
+        var index = this.pop();
+        var array_length = this.heap[index];
+        var elt_size = this.heap[index+1];
+        if (elt_index >= array_length) c0_memory_error("Array index out of bounds.");
+        this.push(this.heap[index + 2 + elt_size*elt_index]);
+        this.frame.pc++;
+        break;
+
+    case op.IMLOAD:
+        var addr = this.pop();
+        // Get int32 from bytes
+        var c1 = this.heap[addr];
+        var c2 = this.heap[addr+1];
+        var c3 = this.heap[addr+2];
+        var c4 = this.heap[addr+3];
+        var combined = array_to_i32([c1, c2, c3, c4]);
+        this.push(combined);
+        this.frame.pc++;
+        break;
+
+    case op.IMSTORE:
+        var value = this.pop();
+        var addr = this.pop();
+        var array = i32_to_array(value);
+
+        for (var i = 0; i < 4; i++)
+            this.heap[addr + i] = array[i];
+        this.frame.pc++;
+
+    case op.AMLOAD:
+        var addr = this.pop();
+        this.push(this.heap[addr]);
+        this.frame.pc++;
+        break;
+
+    case op.AMSTORE:
+        var value = this.pop();
+        var addr = this.pop();
+        this.heap[addr] = value;
+        this.frame.pc++;
+        break;
+
+    case op.CMLOAD:
+        var addr = this.pop();
+        this.push(this.heap[addr]);
+        this.frame.pc++;
+        break;
+
+    case op.CMSTORE:
+        var value = this.pop();
+        var addr = this.pop();
+        this.heap[addr] = value;
+        this.frame.pc++;
+        break;
+
     default:
-        console.log("Error: Unknown opcode\n");
+        var opcode_name;
+        try {
+            opcode_name = op.lookup_table[opcode];
+        } catch (ignored) {
+            opcode_name = "UNKNOWN";
+        }
+        console.log("Error: Unknown opcode: 0x" + opcode.toString(16) +
+                    " (" + opcode_name + ")\n");
         throw "Error - unknown opcode";
     }
-    return false;
 }
 
 // Takes in a parsed .bc0 file and runs it
-function execute(f) {
-    console.log("Beginning execution of file " + f);
+function execute(file, callbacks, v) {
+    verbose = typeof v !== 'undefined' ? v : true;
+    log("Initializing with file " + file);
 
-    var state = new ProgramState(f);
+    var state = new ProgramState(file, callbacks);
+
+    log("Beginning execution");
     
     while (true) {
-        // I'm not sure how to structure this control flow yet,
-        // so if anyone has a better idea, let me know
-        try {
-            state.step();
-        } catch (val) {
-            return val;
-        }
+        var val = state.step();
+        if (val !== undefined) return val;
 
         // if (at_breakpoint) {
         //   save state (maybe in a global in this file?)
@@ -389,12 +730,10 @@ function execute(f) {
 
 exports.execute = execute;
 
-// opcode definitions
-
-
-},{"./opcodes":5}],4:[function(require,module,exports){
+},{"./opcodes":6}],5:[function(require,module,exports){
 parser = require("./bytecode-parser");
 c0vm = require("./c0vm.js");
+c0ffi = require("./c0ffi.js");
 
 // console.log("Reading in sample bytecode file:");
 // console.log(parser.getBytes("../test/test.bc0"));
@@ -404,13 +743,33 @@ c0vm = require("./c0vm.js");
 // console.log(file);
 // console.log(file.function_pool[0].code);
 
+// UI interaction functions
+
+function print(arg) {
+  $("#output").append(arg);
+}
+
+callbacks = {};
+callbacks[c0ffi.NATIVE_PRINT] = function(args) {
+  print(args[0]);
+  print("<br />");
+}
+
+callbacks[c0ffi.NATIVE_PRINTINT] = function(args) {
+  print(args[0]);
+  print("<br />");
+}
+
+console.log(callbacks);
+
 $("#run").click(function() {
   var input = $("#bytecode").html().replace(/(\r\n|\n|\r)/gm,"");
   var file = parser.parse($("#bytecode").text());
-  $("#output").text(c0vm.execute(file));
+  print("<br />");
+  print(c0vm.execute(file, callbacks));
 });
 
-},{"./bytecode-parser":2,"./c0vm.js":3}],5:[function(require,module,exports){
+},{"./bytecode-parser":2,"./c0ffi.js":3,"./c0vm.js":4}],6:[function(require,module,exports){
 /* arithmetic operations */
 exports.IADD = 0x60;
 exports.IAND = 0x7E;
@@ -503,12 +862,12 @@ exports.lookup_table = {
     0x13: "ILDC",
     0x14: "ALDC",
     0x00: "NOP",
-    0x9F: "IF",
-    0xA0: "IF",
-    0xA1: "IF",
-    0xA2: "IF",
-    0xA3: "IF",
-    0xA4: "IF",
+    0x9F: "IF_CMPEQ",
+    0xA0: "IF_CMPNE",
+    0xA1: "IF_ICMPLT",
+    0xA2: "IF_ICMPGE",
+    0xA3: "IF_ICMPGT",
+    0xA4: "IF_ICMPLE",
     0xA7: "GOTO",
     0xBF: "ATHROW",
     0xCF: "ASSERT",
@@ -517,6 +876,6 @@ exports.lookup_table = {
     0xB0: "RETURN"
 };
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 
-},{}]},{},[3,2,1,5,4]);
+},{}]},{},[4,2,1,6,5]);
