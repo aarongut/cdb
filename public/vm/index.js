@@ -20,11 +20,13 @@ callbacks = {};
 callbacks[c0ffi.NATIVE_PRINT] = function(args) {
   print(args[0]);
   print("<br />");
+  return 0;
 }
 
 callbacks[c0ffi.NATIVE_PRINTINT] = function(args) {
   print(args[0]);
   print("<br />");
+  return 0;
 }
 
 console.log(callbacks);

@@ -1,0 +1,7 @@
+#use <conio>
+
+int main() {
+  assert(2==2);
+  print("yolomode");
+  return 1;
+}

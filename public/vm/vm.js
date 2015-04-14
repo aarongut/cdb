@@ -25,7 +25,7 @@ ByteStream.prototype.get_u4 = function() {
 ByteStream.prototype.get_i4 = function() {
     var unsigned_val = this.get_u4();
     var sign_mult = (unsigned_val & 0x80000000) ? -1 : 1;
-    return (unsigned_val & 0x7FFFFFFF) * sign_mult;
+    return (unsigned_val & 0x7FFFFFFF) + (unsigned_val & 0x80000000);
 }
 
 ByteStream.prototype.get_bytes = function(n) {
@@ -118,10 +118,11 @@ var Bc0File = function (filename) {
     for (var i = 0; i < this.string_count; i++) {
         var c = stream.get_u1();
         if (c == 0) {
-            this.string_pool.push(current_string);
-            current_string = "";
+            // this.string_pool.push(current_string);
+            // current_string = "";
+            this.string_pool.push(0);
         } else {
-            current_string += String.fromCharCode(c);
+            this.string_pool.push(String.fromCharCode(c));
         }
     }
 
@@ -137,6 +138,15 @@ var Bc0File = function (filename) {
     for (var i = 0; i < this.native_count; i++) {
         this.native_pool.push(new NativeInfo(stream));
     }
+}
+
+Bc0File.prototype.string_from_index = function (i) {
+    var result = "";
+    while (this.string_pool[i] !== 0 && i < this.string_pool.length) {
+        result += this.string_pool[i];
+        i++;
+    }
+    return result;
 }
 
 function parse(filename) {
@@ -277,6 +287,13 @@ function c0_memory_error(val) {
     throw ("c0 memory error: " + val);
 }
 
+function num_to_i32(num) {
+    log("num is 0x" + num.toString(16));
+    log("num & 0x7FFFFFFF is " + (num & 0x7FFFFFFF));
+    log("neg factor is " + ( (num & 0x80000000)));
+    return (num & 0x7FFFFFFF) + ((num & 0x80000000));
+}
+
 function i32_to_array(i32) {
     return [(i32 & 0xFF),
             ((i32 >> 8) & 0xFF),
@@ -339,6 +356,8 @@ ProgramState.prototype.push = function(val) {
 }
 
 ProgramState.prototype.pop = function() {
+    if (this.frame.stack === [])
+        throw "Tried to pop from an empty stack!";
     return this.frame.stack.pop();
 }
 
@@ -413,19 +432,20 @@ ProgramState.prototype.step = function() {
         var y = this.pop();
         var x = this.pop();
         log("Adding " + x + " and " + y);
-        this.push((x+y) % 0x100000000);
+        this.push(num_to_i32(x+y));
         break;
     case op.ISUB:
         this.frame.pc++;
         var y = this.pop();
         var x = this.pop();
-        this.push((x-y) % 0x100000000);
+        log("Subtracting " + x + " and " + y);
+        this.push(num_to_i32(x-y));
         break;
     case op.IMUL:
         this.frame.pc++;
         var y = this.pop();
         var x = this.pop();
-        this.push((x*y) % 0x100000000);
+        this.push(num_to_i32(x*y));
         break;
     case op.IDIV:
         this.frame.pc++;
@@ -490,7 +510,9 @@ ProgramState.prototype.step = function() {
     case op.VSTORE:
         this.frame.pc += 2;
         var index = this.frame.program[this.frame.pc-1];
-        this.frame.variables[index] = this.pop();
+        var val = this.pop();
+        this.frame.variables[index] = val;
+        log("Set variable " + index + " to value " + val);
         break;
     case op.ACONST_NULL:
         this.frame.pc++;
@@ -510,7 +532,7 @@ ProgramState.prototype.step = function() {
         var c2 = this.frame.program[this.frame.pc-1];
         var index = (c1 * 0x1000) + c2;
 
-        this.push(this.file.string_pool[index]);
+        this.push(this.file.string_from_index(index));
         break;
 
         // Control flow
@@ -589,6 +611,8 @@ ProgramState.prototype.step = function() {
             };
             console.log("Unknown native function index " + f.function_table_index);
         }
+        log("Calling native function with index " + index + " with arguments " + 
+            arg_array);
         this.push(native_function(arg_array));
         break;
 
@@ -633,7 +657,7 @@ ProgramState.prototype.step = function() {
         // Read offset into a struct
         var offset = this.frame.program[this.frame.pc + 1];
         var index = this.pop();
-        this.push(this.heap[index + offset]);
+        this.push(index + offset);
         this.frame.pc += 2;
         break;
 
@@ -641,10 +665,16 @@ ProgramState.prototype.step = function() {
         // Read offset into an array
         var elt_index = this.pop();
         var index = this.pop();
-        var array_length = this.heap[index];
-        var elt_size = this.heap[index+1];
-        if (elt_index >= array_length) c0_memory_error("Array index out of bounds.");
-        this.push(this.heap[index + 2 + elt_size*elt_index]);
+
+        if (typeof index == "string") {
+            this.push(index.slice(elt_index));
+        } else {
+            var array_length = this.heap[index];
+            var elt_size = this.heap[index+1];
+            if (elt_index >= array_length)
+                c0_memory_error("Array index out of bounds.");
+            this.push(index + 2 + (elt_size*elt_index));
+        }
         this.frame.pc++;
         break;
 
@@ -668,6 +698,7 @@ ProgramState.prototype.step = function() {
         for (var i = 0; i < 4; i++)
             this.heap[addr + i] = array[i];
         this.frame.pc++;
+        break;
 
     case op.AMLOAD:
         var addr = this.pop();
@@ -684,7 +715,10 @@ ProgramState.prototype.step = function() {
 
     case op.CMLOAD:
         var addr = this.pop();
-        this.push(this.heap[addr]);
+        if (typeof addr == "string")
+            this.push(addr);
+        else
+            this.push(this.heap[addr]);
         this.frame.pc++;
         break;
 
@@ -715,11 +749,23 @@ function execute(file, callbacks, v) {
 
     var state = new ProgramState(file, callbacks);
 
+    if (verbose) log(file);
+
     log("Beginning execution");
     
     while (true) {
         var val = state.step();
         if (val !== undefined) return val;
+
+        if (verbose) {
+            console.log("Machine state:");
+            console.log("  Current Stack Frame:");
+            console.log("    Stack: " + state.frame.stack);
+            console.log("    PC:    " + state.frame.pc);
+            console.log("    Vars:  " + state.frame.variables);
+            // console.log("    Code:  " + state.frame.program);
+            console.log("  Heap: " + state.heap);
+        }
 
         // if (at_breakpoint) {
         //   save state (maybe in a global in this file?)
@@ -753,11 +799,13 @@ callbacks = {};
 callbacks[c0ffi.NATIVE_PRINT] = function(args) {
   print(args[0]);
   print("<br />");
+  return 0;
 }
 
 callbacks[c0ffi.NATIVE_PRINTINT] = function(args) {
   print(args[0]);
   print("<br />");
+  return 0;
 }
 
 console.log(callbacks);
