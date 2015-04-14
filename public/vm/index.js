@@ -10,6 +10,7 @@ c0vm = require("./c0vm.js");
 // console.log(file.function_pool[0].code);
 
 $("#run").click(function() {
-  var file = parser.parse($("#bytecode").text);
+  var input = $("#bytecode").html().replace(/(\r\n|\n|\r)/gm,"");
+  var file = parser.parse($("#bytecode").text());
   $("#output").text(c0vm.execute(file));
 });

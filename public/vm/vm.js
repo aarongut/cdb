@@ -60,6 +60,7 @@ function getBytes(data) {
 
     // Data contains our file, but we want it as a string
     var string_data = data.toString();
+    console.log(string_data);
 
     // Strip all the comments for easier parsing
     var without_comments = string_data.replace(new RegExp("#.*", "gi"), "");
@@ -404,7 +405,8 @@ c0vm = require("./c0vm.js");
 // console.log(file.function_pool[0].code);
 
 $("#run").click(function() {
-  var file = parser.parse($("#bytecode").text);
+  var input = $("#bytecode").html().replace(/(\r\n|\n|\r)/gm,"");
+  var file = parser.parse($("#bytecode").text());
   $("#output").text(c0vm.execute(file));
 });
 

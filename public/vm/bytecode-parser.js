@@ -18,6 +18,7 @@ function getBytes(data) {
 
     // Data contains our file, but we want it as a string
     var string_data = data.toString();
+    console.log(string_data);
 
     // Strip all the comments for easier parsing
     var without_comments = string_data.replace(new RegExp("#.*", "gi"), "");
