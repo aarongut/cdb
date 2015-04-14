@@ -1,0 +1,22 @@
+struct s 
+{ 
+ 
+ int x; 
+ int y; 
+ int[] a; 
+ 
+}; 
+ 
+int main() 
+{ 
+ struct s* example=alloc(struct s); 
+ example->y=5; 
+ example->x=6; 
+ int x = example->x + 1; 
+ example->a=alloc_array(int,4); 
+ example->a[0] = 5; 
+ int y = example->a[0]; 
+ example->a[0]=3; 
+ //@assert(\length(example->a)==4); 
+ return example->x + x +y; 
+}

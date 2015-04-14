@@ -1,0 +1,55 @@
+C0 C0 FF EE       # magic number
+00 09             # version 4, arch = 1 (64 bits)
+
+00 00             # int pool count
+# int pool
+
+00 25             # string pool total size
+# string pool
+73 61 6D 70 6C 65 32 2E 35 2E 63 30 3A 35 2E 32 2D 35 2E 31 39 3A 20 61 73 73 65 72 74 20 66 61 69 6C 65 64 00  # "sample2.5.c0:5.2-5.19: assert failed"
+
+00 01             # function count
+# function_pool
+
+#<main>
+00 00             # number of arguments = 0
+00 02             # number of local variables = 2
+00 3B             # code length = 59 bytes
+10 00    # bipush 0        # 0
+36 01    # vstore 1        # sum = 0;
+10 0F    # bipush 15       # 15
+36 00    # vstore 0        # i = 15;
+# <00:loop>
+15 00    # vload 0         # i
+10 7A    # bipush 122      # 122
+A4 00 06 # if_icmple +6    # if (i <= 122) goto <01:body>
+A7 00 14 # goto +20        # goto <02:exit>
+# <01:body>
+15 01    # vload 1         # sum
+15 00    # vload 0         # i
+60       # iadd            # 
+36 01    # vstore 1        # sum += i;
+15 00    # vload 0         # i
+10 01    # bipush 1        # 1
+60       # iadd            # 
+36 00    # vstore 0        # i += 1;
+A7 FF E8 # goto -24        # goto <00:loop>
+# <02:exit>
+15 01    # vload 1         # sum
+10 00    # bipush 0        # 0
+9F 00 06 # if_cmpeq +6     # if (sum == 0) goto <03:cond_true>
+A7 00 08 # goto +8         # goto <04:cond_false>
+# <03:cond_true>
+10 01    # bipush 1        # true
+A7 00 05 # goto +5         # goto <05:cond_end>
+# <04:cond_false>
+10 00    # bipush 0        # false
+# <05:cond_end>
+14 00 00 # aldc 0          # s[0] = "sample2.5.c0:5.2-5.19: assert failed"
+CF       # assert          # assert(sum == 0) [failure message on stack]
+15 01    # vload 1         # sum
+B0       # return          # 
+
+00 00             # native count
+# native pool
+

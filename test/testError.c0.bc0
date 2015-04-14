@@ -1,0 +1,40 @@
+C0 C0 FF EE       # magic number
+00 09             # version 4, arch = 1 (64 bits)
+
+00 00             # int pool count
+# int pool
+
+00 2E             # string pool total size
+# string pool
+74 65 73 74 45 72 72 6F 72 2E 63 30 3A 34 2E 33 2D 34 2E 31 36 3A 20 61 73 73 65 72 74 20 66 61 69 6C 65 64 00  # "testError.c0:4.3-4.16: assert failed"
+79 6F 6C 6F 6D 6F 64 65 00  # "yolomode"
+
+00 01             # function count
+# function_pool
+
+#<main>
+00 00             # number of arguments = 0
+00 00             # number of local variables = 0
+00 1F             # code length = 31 bytes
+10 02    # bipush 2        # 2
+10 02    # bipush 2        # 2
+9F 00 06 # if_cmpeq +6     # if (2 == 2) goto <00:cond_true>
+A7 00 08 # goto +8         # goto <01:cond_false>
+# <00:cond_true>
+10 01    # bipush 1        # true
+A7 00 05 # goto +5         # goto <02:cond_end>
+# <01:cond_false>
+10 00    # bipush 0        # false
+# <02:cond_end>
+14 00 00 # aldc 0          # s[0] = "testError.c0:4.3-4.16: assert failed"
+CF       # assert          # assert(2 == 2) [failure message on stack]
+14 00 25 # aldc 37         # s[37] = "yolomode"
+B7 00 00 # invokenative 0  # print("yolomode")
+57       # pop             # (ignore result)
+10 01    # bipush 1        # 1
+B0       # return          # 
+
+00 01             # native count
+# native pool
+00 01 00 06       # print
+

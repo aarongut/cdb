@@ -4,6 +4,8 @@
 	border-radius: 4px;
 	padding: 4px;
 	border-color: #ddd;
+	max-height: 300px;
+	overflow-y: auto;
 }
 
 .brad  {
@@ -29,4 +31,5 @@ nav {
 
 .btm-btn {
 	margin-bottom: 4px;
+	margin-top: -14px;
 }

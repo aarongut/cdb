@@ -1,0 +1,70 @@
+C0 C0 FF EE       # magic number
+00 09             # version 4, arch = 1 (64 bits)
+
+00 00             # int pool count
+# int pool
+
+00 00             # string pool total size
+# string pool
+
+00 01             # function count
+# function_pool
+
+#<main>
+00 00             # number of arguments = 0
+00 03             # number of local variables = 3
+00 52             # code length = 82 bytes
+BB 10    # new 16          # alloc(struct s)
+36 00    # vstore 0        # example = alloc(struct s);
+15 00    # vload 0         # example
+62 04    # aaddf 4         # &example->y
+10 05    # bipush 5        # 5
+4E       # imstore         # example->y = 5;
+15 00    # vload 0         # example
+62 00    # aaddf 0         # &example->x
+10 06    # bipush 6        # 6
+4E       # imstore         # example->x = 6;
+15 00    # vload 0         # example
+62 00    # aaddf 0         # &example->x
+2E       # imload          # example->x
+10 01    # bipush 1        # 1
+60       # iadd            # (example->x + 1)
+36 01    # vstore 1        # x = (example->x + 1);
+15 00    # vload 0         # example
+62 08    # aaddf 8         # &example->a
+10 04    # bipush 4        # 4
+BC 04    # newarray 4      # alloc_array(int, 4)
+4F       # amstore         # example->a = alloc_array(int, 4);
+15 00    # vload 0         # example
+62 08    # aaddf 8         # &example->a
+2F       # amload          # example->a
+10 00    # bipush 0        # 0
+63       # aadds           # &example->a[0]
+10 05    # bipush 5        # 5
+4E       # imstore         # example->a[0] = 5;
+15 00    # vload 0         # example
+62 08    # aaddf 8         # &example->a
+2F       # amload          # example->a
+10 00    # bipush 0        # 0
+63       # aadds           # &example->a[0]
+2E       # imload          # example->a[0]
+36 02    # vstore 2        # y = example->a[0];
+15 00    # vload 0         # example
+62 08    # aaddf 8         # &example->a
+2F       # amload          # example->a
+10 00    # bipush 0        # 0
+63       # aadds           # &example->a[0]
+10 03    # bipush 3        # 3
+4E       # imstore         # example->a[0] = 3;
+15 00    # vload 0         # example
+62 00    # aaddf 0         # &example->x
+2E       # imload          # example->x
+15 01    # vload 1         # x
+60       # iadd            # (example->x + x)
+15 02    # vload 2         # y
+60       # iadd            # ((example->x + x) + y)
+B0       # return          # 
+
+00 00             # native count
+# native pool
+

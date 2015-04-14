@@ -1,5 +1,4 @@
 var ByteStream = function (byte_array) {
-    console.log("Instance created.");
     this.byte_array = byte_array;
     this.index = 0;
 };
@@ -25,7 +24,7 @@ ByteStream.prototype.get_u4 = function() {
 ByteStream.prototype.get_i4 = function() {
     var unsigned_val = this.get_u4();
     var sign_mult = (unsigned_val & 0x80000000) ? -1 : 1;
-    return (unsigned_val & 0x7FFFFFFF) * sign_mult;
+    return (unsigned_val & 0x7FFFFFFF) + (unsigned_val & 0x80000000);
 }
 
 ByteStream.prototype.get_bytes = function(n) {

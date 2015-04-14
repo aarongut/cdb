@@ -1,0 +1,18 @@
+#use <conio>
+
+struct test {
+  int a;
+  string b;
+  int c;
+};
+
+int main() {
+  struct test* t = alloc(struct test);
+  t->a = 1;
+  t->b = "potato chip";
+  t->c = 23;
+  print(t->b);
+  printint(t->a);
+  printint(t->c);
+  return 0;
+}
