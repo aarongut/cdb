@@ -1,5 +1,5 @@
 \section{Literature Review}
-Since the start of our project, we have found multiple new information sources; 
+Since the start of our project, we have found multiple new information sources;
 the following are the most important ones.
 \begin{itemize}
 \item Nodeunit documentation \\
@@ -7,7 +7,7 @@ https://github.com/caolan/nodeunit \\
 % It might be better to put the URLs in the "References" section and add a [\ref{}] here
 We are using nodeunit to test our virtual machine.
 Since the c0 bytecode has many different opcodes that it uses, it is very easy
-for mistakes in the virtual machine to go unnoticed. 
+for mistakes in the virtual machine to go unnoticed.
 To prevent this, we are using the nodeunit library to write unit tests for our
 code.
 This has already helped us to find and solve multiple bugs in the VM, and having
@@ -21,7 +21,7 @@ It has been an important reference while developing a JavaScript version
 of the c0 virtual machine.
 \end{itemize}
 So far, the most important thing we have learned is that good unit tests are
-vital for developing this sort of project. Without unit tests that verify 
+vital for developing this sort of project. Without unit tests that verify
 each opcode used by the virtual machine, many bugs would have gone unnoticed,
 causing problems later down the line. If we only found these bugs by using
 the frontend, they would have been much harder to debug, as there would have

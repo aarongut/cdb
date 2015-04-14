@@ -1,0 +1,6 @@
+PWD /Users/shyam/Dropbox/cdb/progress_report
+INPUT /usr/local/texlive/2014/texmf.cnf
+INPUT /usr/local/texlive/2014/texmf-dist/web2c/texmf.cnf
+INPUT /usr/local/texlive/2014/texmf-var/web2c/pdftex/latex.fmt
+INPUT overview.tex
+OUTPUT overview.log
