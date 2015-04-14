@@ -11,7 +11,7 @@ app.configure(function() {
   app.set('view engine', 'jade');
   app.use(express.logger('dev'));
   app.use(express.json());
-  
+
   app.use(express.static(path.join(__dirname, 'public')));
 
   //debug error handler

@@ -28,7 +28,6 @@ function i32_to_array(i32) {
             ((i32 >> 8) & 0xFF),
             ((i32 >> 16) & 0xFF),
             ((i32 >> 24) & 0xFF)];
-            
 }
 
 function array_to_i32(array) {
@@ -63,13 +62,13 @@ var ProgramState = function(parsed_file, callback_dict) {
         try {
             this.natives[i] = callback_dict[i];
         } catch (key_not_found) {
-            this.natives[i] = function (arg) { 
+            this.natives[i] = function (arg) {
                 console.log("Native function " + name + " called, ran method stub.");
                 return 0;
             };
         }
     }
-    
+
     // Memory is just a big array of bytes, right?
     // "Allocation" is appending onto this array
     // A pointer to memory is an index into this array.
@@ -138,7 +137,7 @@ ProgramState.prototype.step = function() {
     case op.BIPUSH:
         this.frame.pc += 2;
         var val = this.frame.program[this.frame.pc-1];
-        
+
         // Do sign extension if necessary
         if ((val & 0x80) != 0)
             val = -0x80 + (val & 0x7F);
@@ -340,7 +339,7 @@ ProgramState.prototype.step = function() {
             };
             console.log("Unknown native function index " + f.function_table_index);
         }
-        log("Calling native function with index " + index + " with arguments " + 
+        log("Calling native function with index " + index + " with arguments " +
             arg_array);
         this.push(native_function(arg_array));
         break;
@@ -352,7 +351,7 @@ ProgramState.prototype.step = function() {
         var address = this.heap.length;
 
         for (var i = 0; i < size; i++) this.heap.push(0);
-        
+
         this.push(address);
         this.frame.pc += 2;
         break;
@@ -365,7 +364,7 @@ ProgramState.prototype.step = function() {
 
         this.heap.push(num_elements);
         this.heap.push(size);
-        
+
         for (var i = 0; i < num_elements; i++) {
             for (var j = 0; j < size; j++)
                 this.heap.push(0);
@@ -481,7 +480,7 @@ function execute(file, callbacks, v) {
     if (verbose) log(file);
 
     log("Beginning execution");
-    
+
     while (true) {
         var val = state.step();
         if (val !== undefined) return val;
@@ -500,7 +499,7 @@ function execute(file, callbacks, v) {
         //   save state (maybe in a global in this file?)
         //   return;
         // }
-    }        
+    }
 }
 
 exports.execute = execute;
