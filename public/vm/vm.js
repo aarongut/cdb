@@ -860,31 +860,47 @@ c0ffi = require("./c0ffi.js");
 // UI interaction functions
 
 function print(arg) {
-  $("#output").append(arg);
+  // $("#output").append(arg);
+
+  $("#output").val($("#output").val() + arg);
 }
 
 callbacks = c0ffi.default_callbacks;
+
+// conio
 callbacks[c0ffi.NATIVE_PRINT] = function(args) {
   print(args[0]);
-  print("<br />");
   return 0;
 }
+callbacks[c0ffi.NATIVE_PRINTLN] = function(args) {
+  print(args[0]);
+  print("\n");
+}
+callbacks[c0ffi.NATIVE_PRINTBOOL] = function(args) {
+  if (args[0])
+    print("false");
+  else
+    print("true"); 
+}
+callbacks[c0ffi.NATIVE_PRINTCHAR] = function(args) {
+  print(String.fromCharCode(args[0]));
+}
+
+
 
 callbacks[c0ffi.NATIVE_PRINTINT] = function(args) {
   print(args[0]);
-  print("<br />");
   return 0;
 }
 
 console.log(callbacks);
 
 $("#run").click(function() {
-  var input = $("#bytecode").html().replace(/(\r\n|\n|\r)/gm,"");
+  var input = $("#bytecode").val().replace(/(\r\n|\n|\r)/gm,"");
 
-  $("#output").text("");
+  $("#output").val("");
   
-  var file = parser.parse($("#bytecode").text());
-  print("<br />");
+  var file = parser.parse($("#bytecode").val());
   print(c0vm.execute(file, callbacks));
 });
 
