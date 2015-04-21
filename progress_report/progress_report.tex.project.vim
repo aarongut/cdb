@@ -5,7 +5,7 @@ let g:atp_mapNn = 0
 let b:atp_autex = 1
 let b:atp_TexCompiler = 'pdftex'
 let b:atp_TexOptions = '-synctex=1'
-let b:atp_TexFlavor = 'plaintex'
+let b:atp_TexFlavor = 'tex'
 let b:atp_auruns = '1'
 let b:atp_ReloadOnError = '1'
 let b:atp_OutDir = '/Users/shyam/Dropbox/cdb/progress_report'

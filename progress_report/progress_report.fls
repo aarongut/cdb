@@ -124,5 +124,5 @@ INPUT /usr/local/texlive/2014/texmf-dist/fonts/tfm/public/txfonts/txb.tfm
 INPUT /usr/local/texlive/2014/texmf-dist/tex/latex/txfonts/omstxr.fd
 INPUT /usr/local/texlive/2014/texmf-dist/tex/latex/txfonts/omstxr.fd
 INPUT /usr/local/texlive/2014/texmf-dist/fonts/tfm/public/txfonts/txsy.tfm
-INPUT old-gantt.jpg
-INPUT old-gantt.jpg
+INPUT old-gantt.png
+INPUT old-gantt.png
