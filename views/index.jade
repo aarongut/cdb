@@ -48,13 +48,13 @@ block script
     function compile() {
       var code = encodeURIComponent($("#inputCode").val());
       $.ajax({
-              type: "GET",
+              type: "POST",
               async: true,
               url: "http://www.contrib.andrew.cmu.edu/~amgutier/cc0.cgi",
-              dataType: "jsonp",
+              dataType: "json",
               data: {
                 data: code
               },
-              jsonpCallback: "callback"
+              success: callback
       });
     }
