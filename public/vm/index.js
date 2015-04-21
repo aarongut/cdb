@@ -16,7 +16,7 @@ function print(arg) {
   $("#output").append(arg);
 }
 
-callbacks = {};
+callbacks = c0ffi.default_callbacks;
 callbacks[c0ffi.NATIVE_PRINT] = function(args) {
   print(args[0]);
   print("<br />");
@@ -33,6 +33,9 @@ console.log(callbacks);
 
 $("#run").click(function() {
   var input = $("#bytecode").html().replace(/(\r\n|\n|\r)/gm,"");
+
+  $("#output").text("");
+  
   var file = parser.parse($("#bytecode").text());
   print("<br />");
   print(c0vm.execute(file, callbacks));

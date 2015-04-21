@@ -47,9 +47,8 @@ block script
 
     function compile() {
       var code = encodeURIComponent($("#inputCode").val());
-
       $.ajax({
-              type: "POST",
+              type: "GET",
               async: true,
               url: "http://www.contrib.andrew.cmu.edu/~amgutier/cc0.cgi",
               dataType: "jsonp",
