@@ -1,5 +1,9 @@
 # Fdb version 3
+<<<<<<< HEAD
 ["latex"] 1429057416 "progress_report.tex" "progress_report.dvi" "progress_report" 1429057422
+=======
+["latex"] 1429044499 "progress_report.tex" "progress_report.dvi" "progress_report" 1429044577
+>>>>>>> ff581d8a8ce9932bf474596368f94b00770b98d9
   "/usr/local/texlive/2014/texmf-dist/fonts/map/fontname/texfonts.map" 1272929888 3287 e6b82fe08f5336d4d5ebc73fb1152e87 ""
   "/usr/local/texlive/2014/texmf-dist/fonts/tfm/public/cm/cmr10.tfm" 1136768653 1296 45809c5a464d5f32c8f98ba97c1bb47f ""
   "/usr/local/texlive/2014/texmf-dist/fonts/tfm/public/txfonts/txb.tfm" 1136768653 2452 76194099b4f1c022cb59f4564251c4fe ""
@@ -55,6 +59,7 @@
   "/usr/local/texlive/2014/texmf-dist/web2c/texmf.cnf" 1398200874 31722 4f52421e59a4b9e910cf18e64c1f2b4a ""
   "/usr/local/texlive/2014/texmf-var/web2c/pdftex/latex.fmt" 1401025988 3831950 412798929e0196806f9f91e131a01806 ""
   "/usr/local/texlive/2014/texmf.cnf" 1401025936 577 a59edbde8d3a8c549d0eeaab1739e2ff ""
+<<<<<<< HEAD
   "old-gantt.png" 1429057390 101185 f09f139493b49efd4a4a3b3fe455d710 ""
   "progress_report.aux" 1429057422 1054 1fb7c5c88c3fe5c21808963cf33f2978 ""
   "progress_report.out" 1429057422 236 3411de8a1192db7b41eeb11bf4c93fef ""
@@ -66,3 +71,16 @@
   "progress_report.out"
   "progress_report.toc"
   "progress_report.dvi"
+=======
+  "old-gantt.jpg" 1429044440 24493 24188bdf4f5434787c664b216e3898f2 ""
+  "progress_report.aux" 1429044500 1054 1fb7c5c88c3fe5c21808963cf33f2978 ""
+  "progress_report.out" 1429044500 236 3411de8a1192db7b41eeb11bf4c93fef ""
+  "progress_report.tex" 1429044508 7262 ec5dd8aff911c63e55f0b215ebc5fca1 ""
+  "progress_report.toc" 1429044500 0 d41d8cd98f00b204e9800998ecf8427e ""
+  (generated)
+  "progress_report.dvi"
+  "progress_report.out"
+  "progress_report.toc"
+  "progress_report.aux"
+  "progress_report.log"
+>>>>>>> ff581d8a8ce9932bf474596368f94b00770b98d9
