@@ -42,6 +42,7 @@ var StackFrame = function(file, f) {
     this.stack = [];
     this.pc = 0;
     this.program = f.code;
+    this.function_id = f.function_id;
     this.variables = [];
     for (var i = 0; i < f.num_vars; i++)
         this.variables.push(0);
@@ -68,6 +69,8 @@ var ProgramState = function(parsed_file, callback_dict) {
             };
         }
     }
+
+    this.breakpoints = [];
 
     // Memory is just a big array of bytes, right?
     // "Allocation" is appending onto this array
@@ -341,7 +344,7 @@ ProgramState.prototype.step = function() {
         }
         log("Calling native function with index " + index + " with arguments " +
             arg_array);
-        this.push(native_function(arg_array));
+        this.push(native_function(arg_array, this));
         break;
 
         // Memory allocation operations:
@@ -470,8 +473,11 @@ ProgramState.prototype.step = function() {
     }
 }
 
-// Takes in a parsed .bc0 file and runs it
-function execute(file, callbacks, v) {
+ProgramState.prototype.set_breakpoint = function(function_index, opcode_index) {
+    this.breakpoints.push([function_index, opcode_index]);
+}
+
+function initialize_vm(file, callbacks, v) {
     verbose = typeof v !== 'undefined' ? v : true;
     log("Initializing with file " + file);
 
@@ -481,25 +487,44 @@ function execute(file, callbacks, v) {
 
     log("Beginning execution");
 
+    return state;
+}
+
+function run_vm(vm) {
     while (true) {
-        var val = state.step();
+        for (breakpoint in vm.breakpoints) {
+            if (vm.frame.function_id == breakpoint[0] &&
+                vm.frame.pc == breakpoint[1]) {
+                console.log("Breakpoint reached!");
+                return vm;
+            }
+        }
+        
+        var val = vm.step();
         if (val !== undefined) return val;
 
         if (verbose) {
-            console.log("Machine state:");
+            console.log("Machine vm:");
             console.log("  Current Stack Frame:");
-            console.log("    Stack: " + state.frame.stack);
-            console.log("    PC:    " + state.frame.pc);
-            console.log("    Vars:  " + state.frame.variables);
-            // console.log("    Code:  " + state.frame.program);
-            console.log("  Heap: " + state.heap);
+            console.log("    Stack: " + vm.frame.stack);
+            console.log("    PC:    " + vm.frame.pc);
+            console.log("    Vars:  " + vm.frame.variables);
+            // console.log("    Code:  " + vm.frame.program);
+            console.log("  Heap: " + vm.heap);
         }
+    }
+}
 
         // if (at_breakpoint) {
         //   save state (maybe in a global in this file?)
         //   return;
         // }
-    }
+// Takes in a parsed .bc0 file and runs it
+function execute(file, callbacks, v) {
+    var state = initialize_vm(file, callbacks, v);
+    return run_vm(state);
 }
 
 exports.execute = execute;
+exports.initialize_vm = initialize_vm;
+exports.run_vm = run_vm;

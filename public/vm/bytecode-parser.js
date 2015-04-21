@@ -90,6 +90,7 @@ var Bc0File = function (filename) {
     this.function_pool = [];
     for (var i = 0; i < this.function_count; i++) {
         this.function_pool.push(new FunctionInfo(stream));
+        this.function_pool[i].function_id = i;
     }
 
     this.native_count = stream.get_u2();

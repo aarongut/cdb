@@ -108,3 +108,46 @@ exports.NATIVE_STRING_TERMINATED = 92
 exports.NATIVE_STRING_TO_CHARARRAY = 93
 exports.NATIVE_STRING_TOLOWER = 94
 
+callbacks = {};
+callbacks[exports.NATIVE_STRING_LENGTH] =
+    function(args) {
+        return args[0].length;
+    };
+
+callbacks[exports.NATIVE_STRING_TO_CHARARRAY] =
+    function(args, vm) {
+        var address = vm.heap.length;
+        vm.heap.push(args[0].length+1);
+        vm.heap.push(1);
+        for (var i = 0; i < args[0].length; i++) {
+            vm.heap.push(args[0][i]);
+        }
+        vm.heap.push(0);
+        return address;
+    };
+
+
+callbacks[exports.NATIVE_STRING_FROM_CHARARRAY] =
+    function(args, vm) {
+        var i = args[0] + 2;
+        var result = "";
+        while (vm.heap[i] !== 0) {
+            result += vm.heap[i];
+            i++;
+        }
+        return result;
+    };
+
+callbacks[exports.NATIVE_CHAR_CHR] =
+    function(args) {
+        return String.fromCharCode(args[0]);
+    };
+
+callbacks[exports.NATIVE_CHAR_ORD] =
+    function(args) {
+        if (typeof args[0] == "string")
+            return args[0].charCodeAt(0);
+        return args[0];
+    };
+
+exports.default_callbacks = callbacks;

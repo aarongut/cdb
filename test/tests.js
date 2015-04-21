@@ -2,7 +2,8 @@ parser = require("../src/bytecode-parser.js");
 c0vm = require("../src/c0vm.js");
 c0ffi = require("../src/c0ffi.js");
 
-var callbacks = {}
+var callbacks = c0ffi.default_callbacks;
+console.log("Initial callbacks: " + callbacks[c0ffi.NATIVE_STRING_LENGTH](["hi"]));
 var printout = "";
 
 callbacks[c0ffi.NATIVE_PRINT] = function(args) {
@@ -18,30 +19,6 @@ callbacks[c0ffi.NATIVE_PRINTINT] = function(args) {
 callbacks[c0ffi.NATIVE_PRINTLN] = function(args) {
     printout += (args[0] + "\n");
     return 0;
-}
-
-callbacks[c0ffi.NATIVE_STRING_LENGTH] = function(args) {
-    return args[0].length;
-}
-
-callbacks[c0ffi.NATIVE_STRING_TO_CHARARRAY] = function(args) {
-    return args[0];
-}
-
-callbacks[c0ffi.NATIVE_STRING_FROM_CHARARRAY] = function(args) {
-    console.log("string_from_chararray: " + args);
-    return args[0];
-}
-
-callbacks[c0ffi.NATIVE_CHAR_CHR] = function(args) {
-    return String.fromCharCode(args[0]);
-}
-
-callbacks[c0ffi.NATIVE_CHAR_ORD] = function(args) {
-    console.log("native_car_ord: " + args);
-    if (typeof args[0] == "string")
-        return args[0].charCodeAt(0);
-    return args[0];
 }
 
 function doTest(filename, expected_result) {
