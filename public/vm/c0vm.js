@@ -473,7 +473,37 @@ ProgramState.prototype.step = function() {
     }
 }
 
+ProgramState.prototype.remove_breakpoint = function(opcode_index) {
+    if (opcode_index < 0){
+        console.log("Error: negative opcode_index" + opcode_index.toString());
+        throw "Error - negative opcode index";
+    }
+    else if (opcode_index >= this.program.length) {
+        console.log("Error: opcode index larger than max index:"
+                    + opcode_index.toString());
+        throw "Error - opcode index too large";
+    }
+    for (i = 0; i < this.breakpoints.length; i++) {
+        if (this.breakpoints[i][1] == opcode_index){
+            var index = i;
+            array.splice(index,1);
+            return;
+        }
+    }
+    console.log("Error: non-breakpoint opcode index" + opcode_index.toString());
+    throw "Error - non-breakpoint opcode index";
+}
+
 ProgramState.prototype.set_breakpoint = function(function_index, opcode_index) {
+    if (opcode_index < 0) {
+        console.log("Error: negative opcode_index" + opcode_index.toString());
+        throw "Error - negative opcode index";
+    }
+    else if (opcode_index >= this.program.length) {
+        console.log("Error: opcode index larger than max index:"
+                    + opcode_index.toString());
+        throw "Error - opcode index too large";
+    }
     this.breakpoints.push([function_index, opcode_index]);
 }
 
