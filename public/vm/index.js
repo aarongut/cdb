@@ -38,11 +38,11 @@ callbacks[c0ffi.NATIVE_PRINTBOOL] = function(args) {
 callbacks[c0ffi.NATIVE_PRINTCHAR] = function(args) {
   print(String.fromCharCode(args[0]));
 }
-
-
+callbacks[c0ffi.NATIVE_READLINE] = function(args) {
+  return prompt("","");
+}
 callbacks[c0ffi.NATIVE_PRINTINT] = function(args) {
   print(args[0]);
-  return 0;
 }
 
 console.log(callbacks);

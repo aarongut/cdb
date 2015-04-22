@@ -240,33 +240,36 @@ exports.NATIVE_FILE_READLINE = 68
 exports.NATIVE_IMAGE_CLONE = 69
 exports.NATIVE_IMAGE_CREATE = 70
 exports.NATIVE_IMAGE_DATA = 71
-exports.NATIVE_IMAGE_DESTROY = 72
-exports.NATIVE_IMAGE_HEIGHT = 73
-exports.NATIVE_IMAGE_LOAD = 74
-exports.NATIVE_IMAGE_SAVE = 75
-exports.NATIVE_IMAGE_SUBIMAGE = 76
-exports.NATIVE_IMAGE_WIDTH = 77
+exports.NATIVE_IMAGE_HEIGHT = 72
+exports.NATIVE_IMAGE_LOAD = 73
+exports.NATIVE_IMAGE_SAVE = 74
+exports.NATIVE_IMAGE_SUBIMAGE = 75
+exports.NATIVE_IMAGE_WIDTH = 76
 
 /* parse */
-exports.NATIVE_PARSE_BOOL = 78
-exports.NATIVE_PARSE_INT = 79
+exports.NATIVE_INT_TOKENS = 77
+exports.NATIVE_NUM_TOKENS = 78
+exports.NATIVE_PARSE_BOOL = 79
+exports.NATIVE_PARSE_INT = 80
+exports.NATIVE_PARSE_INTS = 81
+exports.NATIVE_PARSE_TOKENS = 82
 
 /* string */
-exports.NATIVE_CHAR_CHR = 80
-exports.NATIVE_CHAR_ORD = 81
-exports.NATIVE_STRING_CHARAT = 82
-exports.NATIVE_STRING_COMPARE = 83
-exports.NATIVE_STRING_EQUAL = 84
-exports.NATIVE_STRING_FROM_CHARARRAY = 85
-exports.NATIVE_STRING_FROMBOOL = 86
-exports.NATIVE_STRING_FROMCHAR = 87
-exports.NATIVE_STRING_FROMINT = 88
-exports.NATIVE_STRING_JOIN = 89
-exports.NATIVE_STRING_LENGTH = 90
-exports.NATIVE_STRING_SUB = 91
-exports.NATIVE_STRING_TERMINATED = 92
-exports.NATIVE_STRING_TO_CHARARRAY = 93
-exports.NATIVE_STRING_TOLOWER = 94
+exports.NATIVE_CHAR_CHR = 83
+exports.NATIVE_CHAR_ORD = 84
+exports.NATIVE_STRING_CHARAT = 85
+exports.NATIVE_STRING_COMPARE = 86
+exports.NATIVE_STRING_EQUAL = 87
+exports.NATIVE_STRING_FROM_CHARARRAY = 88
+exports.NATIVE_STRING_FROMBOOL = 89
+exports.NATIVE_STRING_FROMCHAR = 90
+exports.NATIVE_STRING_FROMINT = 91
+exports.NATIVE_STRING_JOIN = 92
+exports.NATIVE_STRING_LENGTH = 93
+exports.NATIVE_STRING_SUB = 94
+exports.NATIVE_STRING_TERMINATED = 95
+exports.NATIVE_STRING_TO_CHARARRAY = 96
+exports.NATIVE_STRING_TOLOWER = 97
 
 callbacks = {};
 callbacks[exports.NATIVE_STRING_LENGTH] =
@@ -309,6 +312,12 @@ callbacks[exports.NATIVE_CHAR_ORD] =
             return args[0].charCodeAt(0);
         return args[0];
     };
+
+callbacks[exports.NATIVE_STRING_COMPARE] = function(args) {
+  if (args[0] < args[1]) return -1;
+  if (args[0] > args[1]) return 1;
+  return 0;
+}
 
 exports.default_callbacks = callbacks;
 
@@ -840,9 +849,15 @@ function execute(file, callbacks, v) {
     return run_vm(state);
 }
 
+function push(v) {
+  console.log("Pretend I pushed " + v);
+}
+  
+
 exports.execute = execute;
 exports.initialize_vm = initialize_vm;
 exports.run_vm = run_vm;
+exports.push = push;
 
 },{"./opcodes":6}],5:[function(require,module,exports){
 parser = require("./bytecode-parser");
@@ -885,12 +900,11 @@ callbacks[c0ffi.NATIVE_PRINTBOOL] = function(args) {
 callbacks[c0ffi.NATIVE_PRINTCHAR] = function(args) {
   print(String.fromCharCode(args[0]));
 }
-
-
-
+callbacks[c0ffi.NATIVE_READLINE] = function(args) {
+  return prompt("","");
+}
 callbacks[c0ffi.NATIVE_PRINTINT] = function(args) {
   print(args[0]);
-  return 0;
 }
 
 console.log(callbacks);

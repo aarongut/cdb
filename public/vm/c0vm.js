@@ -525,6 +525,12 @@ function execute(file, callbacks, v) {
     return run_vm(state);
 }
 
+function push(v) {
+  console.log("Pretend I pushed " + v);
+}
+  
+
 exports.execute = execute;
 exports.initialize_vm = initialize_vm;
 exports.run_vm = run_vm;
+exports.push = push;
