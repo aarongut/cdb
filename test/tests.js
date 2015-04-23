@@ -110,3 +110,18 @@ exports.testSTRINGS = function(test) {
             printout);
     test.done();
 }
+
+exports.testBREAKPOINT1 = function(test) {
+    var vm = c0vm.initialize_vm(parser.parseFile("easyMath.c0.bc0"),
+                                callbacks, false);
+    vm.set_breakpoint(0, 4);
+    var result = vm.run();
+    test.ok(result === vm,
+            "VM did not stop at breakpoint, instead returned " + result);
+    test.ok(vm.frame.stack[0] == 23 &&
+            vm.frame.stack[1] == 19,
+            "VM stack incorrect");
+    result = vm.run();
+    test.ok(result == 1748, "VM did not resume operation correctly, gave result " + result);
+    test.done();
+}

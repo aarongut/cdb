@@ -478,7 +478,7 @@ ProgramState.prototype.remove_breakpoint = function(opcode_index) {
         console.log("Error: negative opcode_index" + opcode_index.toString());
         throw "Error - negative opcode index";
     }
-    else if (opcode_index >= this.program.length) {
+    else if (opcode_index >= this.frame.program.length) {
         console.log("Error: opcode index larger than max index:"
                     + opcode_index.toString());
         throw "Error - opcode index too large";
@@ -499,12 +499,43 @@ ProgramState.prototype.set_breakpoint = function(function_index, opcode_index) {
         console.log("Error: negative opcode_index" + opcode_index.toString());
         throw "Error - negative opcode index";
     }
-    else if (opcode_index >= this.program.length) {
+    else if (opcode_index >= this.frame.program.length) {
         console.log("Error: opcode index larger than max index:"
                     + opcode_index.toString());
         throw "Error - opcode index too large";
     }
     this.breakpoints.push([function_index, opcode_index]);
+}
+
+ProgramState.prototype.run = function() {
+    while (true) {
+        for (var i = 0; i < this.breakpoints.length; i++) {
+            var breakpoint = this.breakpoints[i];
+            
+            if (this.frame.function_id == breakpoint[0] &&
+                this.frame.pc == breakpoint[1] &&
+                this.stoppedAt !== breakpoint) {
+                log("Breakpoint reached!");
+                this.stoppedAt = breakpoint;
+                return this;
+            }
+        }
+
+        this.stoppedAt = undefined;
+        
+        var val = this.step();
+        if (val !== undefined) return val;
+
+        if (verbose) {
+            console.log("Machine this:");
+            console.log("  Current Stack Frame:");
+            console.log("    Stack: " + this.frame.stack);
+            console.log("    PC:    " + this.frame.pc);
+            console.log("    Vars:  " + this.frame.variables);
+            // console.log("    Code:  " + this.frame.program);
+            console.log("  Heap: " + this.heap);
+        }
+    }
 }
 
 function initialize_vm(file, callbacks, v) {
@@ -520,37 +551,11 @@ function initialize_vm(file, callbacks, v) {
     return state;
 }
 
-function run_vm(vm) {
-    while (true) {
-        for (breakpoint in vm.breakpoints) {
-            if (vm.frame.function_id == breakpoint[0] &&
-                vm.frame.pc == breakpoint[1]) {
-                console.log("Breakpoint reached!");
-                return vm;
-            }
-        }
-        
-        var val = vm.step();
-        if (val !== undefined) return val;
-
-        if (verbose) {
-            console.log("Machine vm:");
-            console.log("  Current Stack Frame:");
-            console.log("    Stack: " + vm.frame.stack);
-            console.log("    PC:    " + vm.frame.pc);
-            console.log("    Vars:  " + vm.frame.variables);
-            // console.log("    Code:  " + vm.frame.program);
-            console.log("  Heap: " + vm.heap);
-        }
-    }
-}
-
 // Takes in a parsed .bc0 file and runs it
 function execute(file, callbacks, v) {
     var state = initialize_vm(file, callbacks, v);
-    return run_vm(state);
+    return state.run();
 }
 
 exports.execute = execute;
 exports.initialize_vm = initialize_vm;
-exports.run_vm = run_vm;
