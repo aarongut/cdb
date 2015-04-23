@@ -545,10 +545,6 @@ function run_vm(vm) {
     }
 }
 
-        // if (at_breakpoint) {
-        //   save state (maybe in a global in this file?)
-        //   return;
-        // }
 // Takes in a parsed .bc0 file and runs it
 function execute(file, callbacks, v) {
     var state = initialize_vm(file, callbacks, v);

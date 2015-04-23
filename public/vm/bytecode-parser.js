@@ -4,21 +4,8 @@ byte_stream = require("./byte-stream");
 // This is a simple, kinda hacky bytecode parser for .bc0 files
 // Now takes in raw bytecode
 function getBytes(data) {
-  /*
-    var data = fs.readFileSync(filename);
-    
-    if (data == null) {
-        if (err["code"] === "ENOENT")
-            console.log("Error: file " + filename + " does not exist.");
-        else
-            console.log("Error: " + err);
-        return;
-    }
-    */
-
     // Data contains our file, but we want it as a string
     var string_data = data.toString();
-    console.log(string_data);
 
     // Strip all the comments for easier parsing
     var without_comments = string_data.replace(new RegExp("#.*", "gi"), "");
@@ -33,7 +20,6 @@ function getBytes(data) {
         });
 
     // We now have an array of bytes. That's probably everything we need, right?
-    console.log(bytes);
     return bytes;
 
 }
@@ -109,9 +95,24 @@ Bc0File.prototype.string_from_index = function (i) {
     return result;
 }
 
-function parse(filename) {
-    return new Bc0File(filename);
+function parse(bytecode) {
+    return new Bc0File(bytecode);
+}
+
+function parseFile(filename) {
+    var data = fs.readFileSync(filename);
+    
+    if (data == null) {
+        if (err["code"] === "ENOENT")
+            console.log("Error: file " + filename + " does not exist.");
+        else
+            console.log("Error: " + err);
+        return;
+    }
+
+    return parse(data);
 }
 
 exports.getBytes = getBytes;
 exports.parse = parse;
+exports.parseFile = parseFile;
