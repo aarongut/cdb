@@ -115,9 +115,10 @@ ProgramState.prototype.doIf = function(f) {
 }
 
 ProgramState.prototype.step = function() {
+    this.maintain_line_numbers();
     var opcode = this.frame.program[this.frame.pc]
     log("0x" + this.frame.pc.toString(16) + " Running opcode " +
-        op.lookup_table[opcode]);
+        op.lookup_table[opcode] + " at line " + this.bytecode_line);
     switch (opcode) {
         // Stack manipulation
     case op.POP:
@@ -473,6 +474,12 @@ ProgramState.prototype.step = function() {
     }
 }
 
+ProgramState.prototype.maintain_line_numbers = function() {
+    this.bytecode_line = this.file.line_for_indices(this.frame.function_id,
+                                                    this.frame.pc);
+    // this.c0_line = SOMEHOW GET THE LINE IN THE c0 FILE
+}
+
 ProgramState.prototype.remove_breakpoint = function(opcode_index) {
     if (opcode_index < 0){
         console.log("Error: negative opcode_index" + opcode_index.toString());
@@ -514,14 +521,17 @@ ProgramState.prototype.run = function() {
             
             if (this.frame.function_id == breakpoint[0] &&
                 this.frame.pc == breakpoint[1] &&
-                this.stoppedAt !== breakpoint) {
+                this.stopped_at !== breakpoint) {
                 log("Breakpoint reached!");
-                this.stoppedAt = breakpoint;
+                this.stopped_at = breakpoint;
+
+                this.maintain_line_numbers();
+
                 return this;
             }
         }
 
-        this.stoppedAt = undefined;
+        this.stopped_at = undefined;
         
         var val = this.step();
         if (val !== undefined) return val;

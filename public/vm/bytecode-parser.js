@@ -24,10 +24,33 @@ function getBytes(data) {
 
 }
 
+function getLineNumbers(data) {
+    var string_data = data.toString();
+
+    // Strip all the comments for easier parsing
+    var without_comments = string_data.replace(new RegExp("#.*", "gi"), "");
+
+    // Each byte should now be a pair of two hex digits.
+    // Put all these in an array.
+    var lines = without_comments.split("\n");
+    var line_numbers = [];
+    for (var line_number = 0; line_number < lines.length; line_number++ ) {
+        lines[line_number].replace(
+            new RegExp("([0123456789ABCDEF][0123456789ABCDEF])", "gi"),
+            function(next_byte) {
+                // +1 because lines start at 1, for some weird reason.
+                // Who doesn't start counting at 0?
+                line_numbers.push(line_number+1);
+            });
+    }
+    return line_numbers;
+}
+
 var FunctionInfo = function (stream) {
     this.num_args = stream.get_u2();
     this.num_vars = stream.get_u2();
     this.code_length = stream.get_u2();
+    this.code_byte_offset = stream.index;
     this.code = stream.get_bytes(this.code_length);
 }
 
@@ -36,8 +59,9 @@ var NativeInfo = function (stream) {
     this.function_table_index = stream.get_u2();
 }
 
-var Bc0File = function (filename) {
-    var file = getBytes(filename);
+var Bc0File = function (bytecode) {
+    var file = getBytes(bytecode);
+    this.line_numbers = getLineNumbers(bytecode);
     var stream = new byte_stream.ByteStream(file);
     
     var magic = stream.get_u4();
@@ -93,6 +117,12 @@ Bc0File.prototype.string_from_index = function (i) {
         i++;
     }
     return result;
+}
+
+Bc0File.prototype.line_for_indices = function(function_index, byte_offset) {
+    var offset_in_file = this.function_pool[function_index].code_byte_offset + 
+        byte_offset;
+    return this.line_numbers[offset_in_file];
 }
 
 function parse(bytecode) {

@@ -121,7 +121,12 @@ exports.testBREAKPOINT1 = function(test) {
     test.ok(vm.frame.stack[0] == 23 &&
             vm.frame.stack[1] == 19,
             "VM stack incorrect");
+
+    test.ok(vm.bytecode_line == 19,
+            "VM reports incorrect line in bytecode: " + vm.bytecode_line);
+    
     result = vm.run();
-    test.ok(result == 1748, "VM did not resume operation correctly, gave result " + result);
+    test.ok(result == 1748,
+            "VM did not resume operation correctly, gave result " + result);
     test.done();
 }
