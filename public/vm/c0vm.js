@@ -3,7 +3,6 @@ op = require("./opcodes");
 var INT_MIN = 0x80000000;
 var INT_MAX = 0x7FFFFFFF;
 
-var verbose = false;
 function log(message) {
     if (verbose) console.log(message);
 }
@@ -499,7 +498,7 @@ function run_vm(vm) {
                 return vm;
             }
         }
-        
+
         var val = vm.step();
         if (val !== undefined) return val;
 
@@ -528,7 +527,7 @@ function execute(file, callbacks, v) {
 function push(v) {
   console.log("Pretend I pushed " + v);
 }
-  
+
 
 exports.execute = execute;
 exports.initialize_vm = initialize_vm;
