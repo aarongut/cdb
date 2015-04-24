@@ -3,7 +3,7 @@ extends base
 block head
   title c0db
 
-  link(rel="stylesheet" href="/codemirror.css")
+  link(rel="stylesheet" href="/css/codemirror.css")
 
 
 block nav
@@ -19,7 +19,7 @@ block body
             button(onclick="compile()" type="button").btn.btn-default.btm-btn.pull-right Compile
             #codearea
             textarea.code.formControl.sh_c(rows="12" id="inputCode")
- 
+
       .col-md-6
         p.lbl.
            Bytecode
@@ -33,9 +33,9 @@ block body
         textarea#output.panel.panel-default.code
           &nbsp;
 
-  
+
 block script
-  script(type="text/javascript" src="codemirror-compressed.js")
+  script(type="text/javascript" src="js/codemirror-compressed.js")
   script(type="text/javascript" src="vm/vm.js")
 
   script(type='text/javascript').
