@@ -3,9 +3,6 @@ extends base
 block head
   title c0db
 
-  link(rel="stylesheet" href="/css/codemirror.css")
-
-
 block nav
   +navbar("home")
 
@@ -19,20 +16,32 @@ block body
             button(onclick="compile()" type="button").btn.btn-default.btm-btn.pull-right Compile
             #codearea
             textarea.code.formControl.sh_c(rows="12" id="inputCode")
-
       .col-md-6
-        p.lbl.
-           Bytecode
-        textarea.code.formControl.sh_c(rows="12" id="bytecode")
-           &nbsp;
+        form
+          .form-group
+            label(for="bytecode") Bytecode
+            button(type="button")#run.btn.btn-default.btm-btn.pull-right Run
+            textarea.code.formControl.sh_c(rows="12" id="bytecode")
     .row
-      .col-md-12
-        p.lbl.
-          Output
-        button(type="button")#run.btn.btn-default.btm-btn.pull-right Run
-        textarea#output.panel.panel-default.code
-          &nbsp;
-
+      .col-md-3
+        form
+          .form-group
+            label(for="output") Output
+            button(type="button")#continue.no_disp.btn.btn-default.btm-btn.pull-right Continue
+            button(type="button")#step.no_disp.btn.btn-default.btm-btn.pull-right Step
+            textarea.code.sh_c(id="output")
+      .col-md-6
+        form
+          .form-group
+            label(for="internals") Stack Output
+            button(type="button")#download.btn.btn-default.btm-btn.pull-right Download
+            textarea.code.sh_c(rows="12" id="internals")
+      .col-md-3
+        form
+          .form-group
+            label(for="breakpoints") Breakpoints
+            button(type="button")#break.btn.btn-default.btm-btn.pull-right Save
+            textarea.code.sh_c(id="breakpoints")
 
 block script
   script(type="text/javascript" src="js/codemirror-compressed.js")

@@ -332,7 +332,7 @@ var INT_MIN = 0x80000000;
 var INT_MAX = 0x7FFFFFFF;
 
 function log(message) {
-    if (verbose) console.log(message);
+    if (verbose) $("#internals").val($("#internals").val() + "\n" + message);
 }
 
 function c0_assertion_failure(val) {
@@ -828,7 +828,7 @@ function run_vm(vm) {
         }
 
         var val = vm.step();
-        if (val !== undefined) return val;
+        if (val !== undefined) return vm;
 
         if (verbose) {
             console.log("Machine vm:");
@@ -908,7 +908,29 @@ $("#run").click(function() {
   $("#output").val("");
 
   var file = parser.parse($("#bytecode").val());
-  c0vm.execute(file, callbacks, true);
+  state = c0vm.execute(file, callbacks, true);
+  state = c0vm.initialize_vm(file, callbacks, true);
+});
+
+$("#break").click(function() {
+  var input = $("#breakpoints").val().replace(/(\r\n|\n|\r)/gm,"");
+  var temp = input.split(",");
+  for (a in temp) {
+    temp2 = temp[a].split(" ");
+    state.set_breakpoint(parseInt(temp2[0], 10), parseInt(temp2[1], 10));
+  }
+
+  $("#output").val("");
+  $("#breakpoints").val("");
+  $("#internals").val("");
+});
+
+$("#continue").click(function () {
+  c0vm.run_vm(state);
+});
+
+$("#step").click(function () {
+  state.step();
 });
 
 },{"./bytecode-parser":2,"./c0ffi.js":3,"./c0vm.js":4}],6:[function(require,module,exports){

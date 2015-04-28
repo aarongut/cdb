@@ -43,5 +43,27 @@ $("#run").click(function() {
   $("#output").val("");
 
   var file = parser.parse($("#bytecode").val());
-  c0vm.execute(file, callbacks, true);
+  state = c0vm.execute(file, callbacks, true);
+  state = c0vm.initialize_vm(file, callbacks, true);
+});
+
+$("#break").click(function() {
+  var input = $("#breakpoints").val().replace(/(\r\n|\n|\r)/gm,"");
+  var temp = input.split(",");
+  for (a in temp) {
+    temp2 = temp[a].split(" ");
+    state.set_breakpoint(parseInt(temp2[0], 10), parseInt(temp2[1], 10));
+  }
+
+  $("#output").val("");
+  $("#breakpoints").val("");
+  $("#internals").val("");
+});
+
+$("#continue").click(function () {
+  c0vm.run_vm(state);
+});
+
+$("#step").click(function () {
+  state.step();
 });

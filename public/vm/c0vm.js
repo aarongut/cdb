@@ -4,7 +4,7 @@ var INT_MIN = 0x80000000;
 var INT_MAX = 0x7FFFFFFF;
 
 function log(message) {
-    if (verbose) console.log(message);
+    if (verbose) $("#internals").val($("#internals").val() + "\n" + message);
 }
 
 function c0_assertion_failure(val) {
@@ -500,7 +500,7 @@ function run_vm(vm) {
         }
 
         var val = vm.step();
-        if (val !== undefined) return val;
+        if (val !== undefined) return vm;
 
         if (verbose) {
             console.log("Machine vm:");

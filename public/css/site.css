@@ -1,1 +1,28 @@
-.code{font-family:"DejaVu Sans Mono",Consolas,monospace;width:100%;border-radius:4px;padding:4px;border-color:#ddd;max-height:300px;overflow-y:auto}.brad{font-family:"Courier New",Courier,monospace;font-size:26pt;color:#166d00}.brad :hover{text-decoration:none}nav{background-color:#d8d8d8}.lbl{font-weight:bold;margin-bottom:4px}.btm-btn{margin-bottom:4px;margin-top:-14px}
+.code {
+  font-family: "DejaVu Sans Mono", Consolas, monospace;
+  width: 100%;
+  border-radius: 4px;
+  padding: 4px;
+  border-color: #ddd;
+  max-height: 300px;
+  overflow-y: auto;
+}
+.brad {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 26pt;
+  color: #166d00;
+}
+.brad :hover {
+  text-decoration: none;
+}
+nav {
+  background-color: #d8d8d8;
+}
+.lbl {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+.btm-btn {
+  margin-bottom: 4px;
+  margin-top: -10px;
+}
