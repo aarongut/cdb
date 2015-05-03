@@ -514,6 +514,14 @@ ProgramState.prototype.set_breakpoint = function(function_index, opcode_index) {
     this.breakpoints.push([function_index, opcode_index]);
 }
 
+ProgramState.prototype.set_breakpoint_bytecode_line = function(line) {
+    var indicies = this.file.indicies_for_line(line);
+    if (indicies === null || indicies.length < 2) {
+        console.log("Error - indicies_for_line returned an invalid result.");
+    }
+    this.set_breakpoint(indicies[0], indicies[1]);
+}
+
 ProgramState.prototype.run = function() {
     while (true) {
         for (var i = 0; i < this.breakpoints.length; i++) {

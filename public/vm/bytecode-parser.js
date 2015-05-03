@@ -125,6 +125,26 @@ Bc0File.prototype.line_for_indices = function(function_index, byte_offset) {
     return this.line_numbers[offset_in_file];
 }
 
+Bc0File.prototype.indicies_for_line = function(line) {
+    // Performs a linear search through the (bytecode to line number) map
+    // to find the bytecode offsets corresponding to a line number
+    var function_index = 0;
+    while (function_index < this.function_pool.length - 1) {
+        var function_start = this.function_pool[function_index + 1].code_byte_offset;
+        if (this.line_numbers[function_start] > line) break;
+        function_start++;
+    }
+
+    // function_index should now be set to the index of the function containing our line
+    var f = this.function_pool[function_index];
+    var offset = 0;
+    while (offset < f.code.length - 1) {
+        if (this.line_numbers[f.code_byte_offset + offset] > line) break;
+        offset++;
+    }
+    return [function_index, offset];
+}
+
 function parse(bytecode) {
     return new Bc0File(bytecode);
 }
