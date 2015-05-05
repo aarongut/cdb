@@ -1,0 +1,11 @@
+This project will benefit students in 15-122 Principals of Imperative
+Computation at Carnegie Mellon University by helping them create correct
+programs. The C0 Debugger will enable students to understand how their programs
+execute and find where problems originate more easily than with existing tools.
+In addition to debugging, students will have better knowledge for how the
+underlying computation model works when evaluating their code.
+
+The C0 Debugger will also enable students to test simple programs with little
+setup, using only a web browser. They will no longer have to set up and become
+familiar with a Unix environment before they can program, making C0 accessible
+to more people.
