@@ -38,3 +38,6 @@ npm-debug.log
 
 #vim swap files
 *.swp
+
+#WHY DO YOU INCLUDE THESE SHYAM?
+*.project.vim
