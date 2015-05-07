@@ -1,7 +1,22 @@
 Approach
-	The approach section contains our methodology, how we plan to implement the project, and our project schedule, the timeline we plan to adhere to. The methodology outlines the specific tools we will use to complete the project in a timely manner whereas the schedule outlines the deadlines by which we hope to have certain tasks completed.
+The approach section contains our methodology, how we plan to
+implement the project, and our project schedule, the timeline we plan to adhere
+to. The methodology outlines the specific tools we will use to complete the
+project in a timely manner whereas the schedule outlines the deadlines by which
+we hope to have certain tasks completed.
 
 Methodology
-	C$_0$ Cement is a Debugger designed for the CMU teaching language, C$_0$. It will be hosted on <BLANK> with the website itself designed in CSS and HTML, using Node.js to run most of the core functionality. We will first deploy a blank template website after which half of the team wil work on parsing C0 bytecode and the other half will work on creating a meaningful user experience. Once both teams have made reasonable progress, they will combine the two units to complete the basic outline of the project.
-Project Schedule
-The project will be separated into five main phases: Basic Website Design, Backend implementation, Frontend Implementation, User Testing, and Revisions. The first phase should take <POSSIBLY CHANGE THIS> less than a week with the next two phases occurring simultaneously and composing the rest of the month's work. User implementation and revisions will then hopefully take up the remainder of the alloted time, with extra time padded in case implementation or revisions are more extensive than we have predicted.
+C$_0$ Cement is a Debugger designed for the CMU teaching language,
+C$_0$. It will be hosted on <BLANK> with the website itself designed in CSS and
+HTML, using Node.js to run most of the core functionality. We will first deploy
+a blank template website after which half of the team wil work on parsing C0
+bytecode and the other half will work on creating a meaningful user experience.
+Once both teams have made reasonable progress, they will combine the two units
+to complete the basic outline of the project.  Project Schedule The project
+will be separated into five main phases: Basic Website Design, Backend
+implementation, Frontend Implementation, User Testing, and Revisions. The first
+phase should take <POSSIBLY CHANGE THIS> less than a week with the next two
+phases occurring simultaneously and composing the rest of the month's work.
+User implementation and revisions will then hopefully take up the remainder of
+the alloted time, with extra time padded in case implementation or revisions
+are more extensive than we have predicted.

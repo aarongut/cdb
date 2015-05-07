@@ -1,4 +1,4 @@
-all: final
+all: final final
 
 letter:
 	pdflatex letter.tex
